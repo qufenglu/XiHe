@@ -1,0 +1,12 @@
+﻿  正在清理远程项目目录
+  正在验证源
+  正在将源远程复制到“169.254.194.24”
+  正在验证体系结构
+  正在验证体系结构
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Application Type\Linux\1.0\Linux.targets(202,5): error : 找不到连接
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Application Type\Linux\1.0\Linux.targets(202,5): error :    在 liblinux.SshRemoteSystemFactory.Create(String connectionName)
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Application Type\Linux\1.0\Linux.targets(202,5): error :    在 Microsoft.Build.Linux.Tasks.RemoteToolTask.get_Factory()
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Application Type\Linux\1.0\Linux.targets(202,5): error :    在 Microsoft.Build.Linux.Tasks.RemoteToolTask.get_RemoteSystem()
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Application Type\Linux\1.0\Linux.targets(202,5): error :    在 Microsoft.Build.Linux.Tasks.RemoteToolTask.GetProcessorArchitecture()
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Application Type\Linux\1.0\Linux.targets(202,5): error :    在 Microsoft.Build.Linux.Tasks.ValidateValidArchitecture.ExecuteTool()
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Application Type\Linux\1.0\Linux.targets(202,5): error :    在 Microsoft.Build.Linux.Tasks.RemoteToolTask.Execute()

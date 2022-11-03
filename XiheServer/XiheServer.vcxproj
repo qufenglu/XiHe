@@ -1,0 +1,794 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{b8bfcff2-897d-402b-893e-a3642128babe}</ProjectGuid>
+    <Keyword>Linux</Keyword>
+    <RootNamespace>XiheServer</RootNamespace>
+    <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
+    <ApplicationType>Linux</ApplicationType>
+    <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
+    <TargetLinuxPlatform>Raspberry</TargetLinuxPlatform>
+    <LinuxProjectType>{8748239F-558C-44D1-944B-07B09C35B330}</LinuxProjectType>
+    <ProjectName>XiheServer</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <RemoteCompileLocalCopyObjectFiles>true</RemoteCompileLocalCopyObjectFiles>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <RemoteCompileLocalCopyObjectFiles>true</RemoteCompileLocalCopyObjectFiles>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <Link>
+      <LibraryDependencies>wiringPi;pthread;avcodec;avformat;swscale;avutil</LibraryDependencies>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <AdditionalLibraryDirectories>/usr/lib/;/usr/local/lib/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <RemotePostBuildEvent>
+      <Command>gpio export 17 out</Command>
+      <Message>export pin 17 using the gpio utility so that we can execute the blink program without sudo</Message>
+    </RemotePostBuildEvent>
+    <ClCompile />
+    <ClCompile>
+      <AdditionalOptions>-lpthread -lavutil -lavcodec -lavformat %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>../BaseClass/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <Link>
+      <LibraryDependencies>wiringPi;pthread;avcodec;avformat;swscale;avutil</LibraryDependencies>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <AdditionalLibraryDirectories>/usr/lib/;/usr/local/lib/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <RemotePostBuildEvent>
+      <Command>gpio export 17 out</Command>
+      <Message>export pin 17 using the gpio utility so that we can execute the blink program without sudo</Message>
+    </RemotePostBuildEvent>
+    <ClCompile />
+    <ClCompile>
+      <AdditionalOptions>-lpthread -lavutil -lavcodec -lavformat %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>../BaseClass/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\BaseClass\CommonTools\ExBuff.cpp" />
+    <ClCompile Include="..\BaseClass\CommonTools\FlexibleBuff.cpp" />
+    <ClCompile Include="..\BaseClass\CommonTools\RtspParser.cpp" />
+    <ClCompile Include="..\BaseClass\CommonTools\TimeCounter.cpp" />
+    <ClCompile Include="..\BaseClass\DigitalTransport\DigitalTransport.cpp" />
+    <ClCompile Include="..\BaseClass\DigitalTransport\UARTDataChannel.cpp" />
+    <ClCompile Include="..\BaseClass\DigitalTransport\UDPDataChannel.cpp" />
+    <ClCompile Include="..\BaseClass\FEC\FEC2DTable.cpp" />
+    <ClCompile Include="..\BaseClass\FEC\FECDecoder.cpp" />
+    <ClCompile Include="..\BaseClass\FEC\FECEncoder.cpp" />
+    <ClCompile Include="..\BaseClass\ImageTransoprt\ImageTransoprt.cpp" />
+    <ClCompile Include="..\BaseClass\Log\Log.cpp" />
+    <ClCompile Include="..\BaseClass\MediaCapture\VideoCapture.cpp" />
+    <ClCompile Include="..\BaseClass\MediaDecoder\VideoDecoder.cpp" />
+    <ClCompile Include="..\BaseClass\MediaEncoder\VideoEncoder.cpp" />
+    <ClCompile Include="..\BaseClass\MP4Tool\MP4Reader.cpp" />
+    <ClCompile Include="..\BaseClass\MP4Tool\MP4Writer.cpp" />
+    <ClCompile Include="..\BaseClass\OSD\Bitmap.cpp" />
+    <ClCompile Include="..\BaseClass\OSD\Marker.cpp" />
+    <ClCompile Include="..\BaseClass\OSD\OSD.cpp" />
+    <ClCompile Include="..\BaseClass\RTPPacketizer\H264RTPpacketizer.cpp" />
+    <ClCompile Include="..\BaseClass\RTPParser\H264RTPParser.cpp" />
+    <ClCompile Include="..\BaseClass\RTSPServer\RTSPServer.cpp" />
+    <ClCompile Include="..\BaseClass\RTSPServer\RTSPServerSession.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="XiheServer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\BaseClass\Common.h" />
+    <ClInclude Include="..\BaseClass\CommonTools\ExBuff.h" />
+    <ClInclude Include="..\BaseClass\CommonTools\FlexibleBuff.h" />
+    <ClInclude Include="..\BaseClass\CommonTools\RtspParser.h" />
+    <ClInclude Include="..\BaseClass\CommonTools\TimeCounter.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\DataChannel.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\DigitalTransport.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\ardupilotmega.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\ardupilotmega.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\gtestsuite.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_adap_tuning.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_adap_tuning.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_ahrs.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_ahrs.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_ahrs2.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_ahrs2.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_ahrs3.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_ahrs3.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_airspeed_autocal.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_airspeed_autocal.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_aoa_ssa.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_aoa_ssa.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_ap_adc.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_ap_adc.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_autopilot_version_request.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_autopilot_version_request.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_battery2.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_battery2.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_camera_feedback.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_camera_feedback.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_camera_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_camera_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_compassmot_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_compassmot_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_data16.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_data16.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_data32.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_data32.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_data64.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_data64.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_data96.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_data96.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_deepstall.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_deepstall.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_device_op_read.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_device_op_read.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_device_op_read_reply.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_device_op_read_reply.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_device_op_write.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_device_op_write.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_device_op_write_reply.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_device_op_write_reply.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_digicam_configure.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_digicam_configure.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_digicam_control.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_digicam_control.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_ekf_status_report.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_ekf_status_report.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_esc_telemetry_1_to_4.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_esc_telemetry_1_to_4.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_esc_telemetry_5_to_8.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_esc_telemetry_5_to_8.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_esc_telemetry_9_to_12.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_esc_telemetry_9_to_12.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_fence_fetch_point.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_fence_fetch_point.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_fence_point.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_fence_point.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_gimbal_control.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_gimbal_control.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_gimbal_report.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_gimbal_report.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_gimbal_torque_cmd_report.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_gimbal_torque_cmd_report.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_gopro_get_request.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_gopro_get_request.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_gopro_get_response.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_gopro_get_response.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_gopro_heartbeat.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_gopro_heartbeat.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_gopro_set_request.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_gopro_set_request.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_gopro_set_response.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_gopro_set_response.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_hwstatus.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_hwstatus.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_led_control.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_led_control.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_limits_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_limits_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_mag_cal_progress.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_mag_cal_progress.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_mcu_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_mcu_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_meminfo.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_meminfo.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_mount_configure.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_mount_configure.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_mount_control.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_mount_control.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_mount_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_mount_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_obstacle_distance_3d.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_obstacle_distance_3d.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_osd_param_config.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_osd_param_config.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_osd_param_config_reply.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_osd_param_config_reply.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_osd_param_show_config.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_osd_param_show_config.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_osd_param_show_config_reply.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_osd_param_show_config_reply.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_pid_tuning.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_pid_tuning.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_radio.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_radio.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_rally_fetch_point.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_rally_fetch_point.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_rally_point.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_rally_point.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_rangefinder.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_rangefinder.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_remote_log_block_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_remote_log_block_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_remote_log_data_block.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_remote_log_data_block.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_rpm.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_rpm.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_sensor_offsets.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_sensor_offsets.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_set_mag_offsets.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_set_mag_offsets.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_simstate.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_simstate.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_vision_position_delta.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_vision_position_delta.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_water_depth.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_water_depth.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_wind.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\mavlink_msg_wind.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\testsuite.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\ardupilotmega\version.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\checksum.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\common.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\common.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\gtestsuite.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_actuator_control_target.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_actuator_control_target.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_actuator_output_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_actuator_output_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_adsb_vehicle.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_adsb_vehicle.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_ais_vessel.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_ais_vessel.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_altitude.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_altitude.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_attitude.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_attitude.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_attitude_quaternion.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_attitude_quaternion.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_attitude_quaternion_cov.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_attitude_quaternion_cov.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_attitude_target.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_attitude_target.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_att_pos_mocap.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_att_pos_mocap.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_auth_key.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_auth_key.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_autopilot_state_for_gimbal_device.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_autopilot_state_for_gimbal_device.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_autopilot_version.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_autopilot_version.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_battery_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_battery_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_button_change.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_button_change.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_camera_capture_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_camera_capture_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_camera_fov_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_camera_fov_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_camera_image_captured.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_camera_image_captured.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_camera_information.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_camera_information.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_camera_settings.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_camera_settings.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_camera_tracking_geo_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_camera_tracking_geo_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_camera_tracking_image_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_camera_tracking_image_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_camera_trigger.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_camera_trigger.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_canfd_frame.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_canfd_frame.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_can_filter_modify.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_can_filter_modify.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_can_frame.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_can_frame.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_cellular_config.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_cellular_config.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_cellular_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_cellular_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_change_operator_control.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_change_operator_control.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_change_operator_control_ack.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_change_operator_control_ack.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_collision.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_collision.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_command_ack.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_command_ack.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_command_cancel.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_command_cancel.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_command_int.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_command_int.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_command_long.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_command_long.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_component_information.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_component_information.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_component_metadata.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_component_metadata.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_control_system_state.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_control_system_state.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_current_event_sequence.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_current_event_sequence.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_data_stream.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_data_stream.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_data_transmission_handshake.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_data_transmission_handshake.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_debug.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_debug.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_debug_float_array.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_debug_float_array.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_debug_vect.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_debug_vect.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_distance_sensor.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_distance_sensor.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_efi_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_efi_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_encapsulated_data.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_encapsulated_data.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_esc_info.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_esc_info.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_esc_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_esc_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_estimator_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_estimator_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_event.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_event.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_extended_sys_state.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_extended_sys_state.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_fence_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_fence_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_file_transfer_protocol.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_file_transfer_protocol.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_flight_information.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_flight_information.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_follow_target.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_follow_target.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_generator_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_generator_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gimbal_device_attitude_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gimbal_device_attitude_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gimbal_device_information.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gimbal_device_information.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gimbal_device_set_attitude.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gimbal_device_set_attitude.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gimbal_manager_information.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gimbal_manager_information.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gimbal_manager_set_attitude.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gimbal_manager_set_attitude.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gimbal_manager_set_manual_control.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gimbal_manager_set_manual_control.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gimbal_manager_set_pitchyaw.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gimbal_manager_set_pitchyaw.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gimbal_manager_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gimbal_manager_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_global_position_int.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_global_position_int.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_global_position_int_cov.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_global_position_int_cov.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_global_vision_position_estimate.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_global_vision_position_estimate.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gps2_raw.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gps2_raw.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gps2_rtk.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gps2_rtk.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gps_global_origin.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gps_global_origin.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gps_inject_data.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gps_inject_data.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gps_input.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gps_input.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gps_raw_int.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gps_raw_int.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gps_rtcm_data.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gps_rtcm_data.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gps_rtk.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gps_rtk.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gps_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_gps_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_highres_imu.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_highres_imu.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_high_latency.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_high_latency.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_high_latency2.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_high_latency2.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_hil_actuator_controls.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_hil_actuator_controls.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_hil_controls.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_hil_controls.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_hil_gps.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_hil_gps.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_hil_optical_flow.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_hil_optical_flow.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_hil_rc_inputs_raw.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_hil_rc_inputs_raw.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_hil_sensor.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_hil_sensor.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_hil_state.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_hil_state.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_hil_state_quaternion.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_hil_state_quaternion.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_home_position.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_home_position.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_hygrometer_sensor.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_hygrometer_sensor.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_isbd_link_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_isbd_link_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_landing_target.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_landing_target.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_link_node_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_link_node_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_local_position_ned.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_local_position_ned.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_local_position_ned_cov.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_local_position_ned_cov.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_local_position_ned_system_global_offset.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_local_position_ned_system_global_offset.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_logging_ack.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_logging_ack.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_logging_data.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_logging_data.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_logging_data_acked.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_logging_data_acked.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_log_data.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_log_data.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_log_entry.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_log_entry.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_log_erase.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_log_erase.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_log_request_data.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_log_request_data.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_log_request_end.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_log_request_end.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_log_request_list.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_log_request_list.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mag_cal_report.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mag_cal_report.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_manual_control.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_manual_control.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_manual_setpoint.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_manual_setpoint.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_memory_vect.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_memory_vect.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_message_interval.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_message_interval.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_ack.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_ack.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_clear_all.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_clear_all.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_count.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_count.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_current.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_current.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_item.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_item.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_item_int.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_item_int.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_item_reached.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_item_reached.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_request.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_request.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_request_int.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_request_int.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_request_list.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_request_list.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_request_partial_list.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_request_partial_list.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_set_current.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_set_current.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_write_partial_list.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mission_write_partial_list.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mount_orientation.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_mount_orientation.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_named_value_float.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_named_value_float.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_named_value_int.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_named_value_int.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_nav_controller_output.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_nav_controller_output.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_obstacle_distance.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_obstacle_distance.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_odometry.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_odometry.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_onboard_computer_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_onboard_computer_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_open_drone_id_arm_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_open_drone_id_arm_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_open_drone_id_authentication.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_open_drone_id_authentication.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_open_drone_id_basic_id.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_open_drone_id_basic_id.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_open_drone_id_location.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_open_drone_id_location.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_open_drone_id_message_pack.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_open_drone_id_message_pack.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_open_drone_id_operator_id.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_open_drone_id_operator_id.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_open_drone_id_self_id.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_open_drone_id_self_id.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_open_drone_id_system.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_open_drone_id_system.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_open_drone_id_system_update.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_open_drone_id_system_update.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_optical_flow.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_optical_flow.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_optical_flow_rad.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_optical_flow_rad.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_orbit_execution_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_orbit_execution_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_ext_ack.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_ext_ack.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_ext_request_list.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_ext_request_list.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_ext_request_read.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_ext_request_read.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_ext_set.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_ext_set.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_ext_value.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_ext_value.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_map_rc.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_map_rc.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_request_list.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_request_list.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_request_read.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_request_read.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_set.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_set.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_value.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_param_value.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_ping.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_ping.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_play_tune.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_play_tune.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_play_tune_v2.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_play_tune_v2.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_position_target_global_int.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_position_target_global_int.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_position_target_local_ned.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_position_target_local_ned.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_power_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_power_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_radio_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_radio_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_raw_imu.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_raw_imu.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_raw_pressure.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_raw_pressure.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_raw_rpm.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_raw_rpm.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_rc_channels.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_rc_channels.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_rc_channels_override.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_rc_channels_override.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_rc_channels_raw.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_rc_channels_raw.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_rc_channels_scaled.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_rc_channels_scaled.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_request_data_stream.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_request_data_stream.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_request_event.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_request_event.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_resource_request.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_resource_request.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_response_event_error.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_response_event_error.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_safety_allowed_area.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_safety_allowed_area.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_safety_set_allowed_area.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_safety_set_allowed_area.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_scaled_imu.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_scaled_imu.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_scaled_imu2.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_scaled_imu2.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_scaled_imu3.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_scaled_imu3.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_scaled_pressure.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_scaled_pressure.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_scaled_pressure2.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_scaled_pressure2.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_scaled_pressure3.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_scaled_pressure3.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_serial_control.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_serial_control.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_servo_output_raw.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_servo_output_raw.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_setup_signing.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_setup_signing.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_set_actuator_control_target.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_set_actuator_control_target.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_set_attitude_target.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_set_attitude_target.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_set_gps_global_origin.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_set_gps_global_origin.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_set_home_position.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_set_home_position.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_set_mode.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_set_mode.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_set_position_target_global_int.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_set_position_target_global_int.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_set_position_target_local_ned.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_set_position_target_local_ned.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_sim_state.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_sim_state.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_smart_battery_info.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_smart_battery_info.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_statustext.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_statustext.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_storage_information.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_storage_information.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_supported_tunes.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_supported_tunes.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_system_time.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_system_time.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_sys_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_sys_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_terrain_check.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_terrain_check.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_terrain_data.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_terrain_data.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_terrain_report.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_terrain_report.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_terrain_request.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_terrain_request.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_timesync.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_timesync.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_time_estimate_to_target.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_time_estimate_to_target.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_trajectory_representation_bezier.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_trajectory_representation_bezier.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_trajectory_representation_waypoints.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_trajectory_representation_waypoints.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_tunnel.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_tunnel.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_uavcan_node_info.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_uavcan_node_info.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_uavcan_node_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_uavcan_node_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_utm_global_position.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_utm_global_position.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_v2_extension.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_v2_extension.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_vfr_hud.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_vfr_hud.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_vibration.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_vibration.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_vicon_position_estimate.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_vicon_position_estimate.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_video_stream_information.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_video_stream_information.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_video_stream_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_video_stream_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_vision_position_estimate.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_vision_position_estimate.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_vision_speed_estimate.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_vision_speed_estimate.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_wheel_distance.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_wheel_distance.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_wifi_config_ap.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_wifi_config_ap.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_winch_status.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_winch_status.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_wind_cov.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\mavlink_msg_wind_cov.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\testsuite.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\common\version.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\icarous\gtestsuite.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\icarous\icarous.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\icarous\icarous.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\icarous\mavlink.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\icarous\mavlink_msg_icarous_heartbeat.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\icarous\mavlink_msg_icarous_heartbeat.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\icarous\mavlink_msg_icarous_kinematic_bands.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\icarous\mavlink_msg_icarous_kinematic_bands.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\icarous\testsuite.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\icarous\version.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\mavlink_conversions.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\mavlink_get_info.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\mavlink_helpers.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\mavlink_sha256.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\mavlink_types.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\message.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\minimal\gtestsuite.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\minimal\mavlink.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\minimal\mavlink_msg_heartbeat.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\minimal\mavlink_msg_heartbeat.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\minimal\mavlink_msg_protocol_version.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\minimal\mavlink_msg_protocol_version.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\minimal\minimal.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\minimal\minimal.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\minimal\testsuite.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\minimal\version.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\msgmap.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\protocol.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\uAvionix\gtestsuite.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\uAvionix\mavlink.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\uAvionix\mavlink_msg_uavionix_adsb_out_cfg.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\uAvionix\mavlink_msg_uavionix_adsb_out_cfg.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\uAvionix\mavlink_msg_uavionix_adsb_out_dynamic.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\uAvionix\mavlink_msg_uavionix_adsb_out_dynamic.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\uAvionix\mavlink_msg_uavionix_adsb_transceiver_health_report.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\uAvionix\mavlink_msg_uavionix_adsb_transceiver_health_report.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\uAvionix\testsuite.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\uAvionix\uAvionix.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\uAvionix\uAvionix.hpp" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\uAvionix\version.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\UARTDataChannel.h" />
+    <ClInclude Include="..\BaseClass\DigitalTransport\UDPDataChannel.h" />
+    <ClInclude Include="..\BaseClass\FEC\FEC2DTable.h" />
+    <ClInclude Include="..\BaseClass\FEC\FECDecoder.h" />
+    <ClInclude Include="..\BaseClass\FEC\FECEncoder.h" />
+    <ClInclude Include="..\BaseClass\ImageTransoprt\ImageTransoprt.h" />
+    <ClInclude Include="..\BaseClass\Log\Log.h" />
+    <ClInclude Include="..\BaseClass\MediaCapture\VideoCapture.h" />
+    <ClInclude Include="..\BaseClass\MediaDecoder\VideoDecoder.h" />
+    <ClInclude Include="..\BaseClass\MediaEncoder\VideoEncoder.h" />
+    <ClInclude Include="..\BaseClass\MP4Tool\MP4Reader.h" />
+    <ClInclude Include="..\BaseClass\MP4Tool\MP4Writer.h" />
+    <ClInclude Include="..\BaseClass\OSD\Bitmap.h" />
+    <ClInclude Include="..\BaseClass\OSD\Marker.h" />
+    <ClInclude Include="..\BaseClass\OSD\OSD.h" />
+    <ClInclude Include="..\BaseClass\RTPPacketizer\H264RTPpacketizer.h" />
+    <ClInclude Include="..\BaseClass\RTPPacketizer\RTPPacketizer.h" />
+    <ClInclude Include="..\BaseClass\RTPParser\H264RTPParser.h" />
+    <ClInclude Include="..\BaseClass\RTPParser\RTPParser.h" />
+    <ClInclude Include="..\BaseClass\RTSPServer\RTSPServer.h" />
+    <ClInclude Include="..\BaseClass\RTSPServer\RTSPServerSession.h" />
+    <ClInclude Include="XiheServer.h" />
+  </ItemGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <Link>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LibraryDependencies>pthread;avcodec;avformat;avutil;swscale;freetype;wiringPi</LibraryDependencies>
+    </Link>
+    <ClCompile>
+      <AdditionalOptions>-Wall %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>../BaseClass/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <Link>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LibraryDependencies>pthread;avcodec;avformat;avutil;swscale;freetype;wiringPi</LibraryDependencies>
+    </Link>
+    <ClCompile>
+      <AdditionalOptions>-Wall %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>../BaseClass/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

@@ -1,0 +1,249 @@
+﻿  正在验证源
+  正在将源远程复制到“192.168.5.4”
+  正在验证体系结构
+  正在验证体系结构
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Application Type\Linux\1.0\Linux.targets(202,5): warning : 当前项目体系结构“ARM”不兼容远程系统体系结构“ARM64”(“aarch64”)。请在 Configuration Manager 中将项目体系结构切换为“ARM64”。如果正在交叉编译，可以忽略此警告。
+  正在启动远程生成
+  正在编译源:
+  ExBuff.cpp
+  FlexibleBuff.cpp
+  RtspParser.cpp
+  TimeCounter.cpp
+  DigitalTransport.cpp
+  FEC2DTable.cpp
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(34,22): warning : left operand of comma operator has no effect [-Wunused-value]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(34,22): warning :    34 |      if (m_pFecTable[row, col] != nullptr)
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(34,22): warning :       |                      ^~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(36,19): warning : left operand of comma operator has no effect [-Wunused-value]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(36,19): warning :    36 |       m_pFecTable[row, col] = nullptr;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(36,19): warning :       |                   ^~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(170,18): warning : left operand of comma operator has no effect [-Wunused-value]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(170,18): warning :   170 |      m_pFecTable[row, col] = nullptr;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(170,18): warning :       |                  ^~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(261,43): warning : conversion from ‘int’ to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(261,43): warning :   261 |  uint16_t seq = (packet->m_pData[2] << 8) | packet->m_pData[3];
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(261,43): warning :       |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(363,36): warning : conversion from ‘int’ to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(363,36): warning :   363 |  pRepairPacketData[14] = nTempSize >> 8;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(363,36): warning :       |                          ~~~~~~~~~~^~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(364,36): warning : conversion from ‘int’ to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(364,36): warning :   364 |  pRepairPacketData[15] = nTempSize & 0xff;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(364,36): warning :       |                          ~~~~~~~~~~^~~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(365,37): warning : conversion from ‘int32_t’ {aka ‘int’} to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(365,37): warning :   365 |  pRepairPacketData[20] = m_nBaseSeq >> 8;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(365,37): warning :       |                          ~~~~~~~~~~~^~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(366,37): warning : conversion from ‘int32_t’ {aka ‘int’} to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(366,37): warning :   366 |  pRepairPacketData[21] = m_nBaseSeq & 0xff;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(366,37): warning :       |                          ~~~~~~~~~~~^~~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(386,32): warning : conversion from ‘size_t’ {aka ‘long unsigned int’} to ‘uint32_t’ {aka ‘unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(386,32): warning :   386 |  (*pRepairPacket)->m_nLength = nRepairPacketSize;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(386,32): warning :       |                                ^~~~~~~~~~~~~~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(412,44): warning : conversion from ‘uint32_t’ {aka ‘unsigned int’} to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(412,44): warning :   412 |    size[nPackNum] = m_pFecTable[row][col]->m_nLength;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(412,44): warning :       |                     ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(429,39): warning : conversion from ‘uint32_t’ {aka ‘unsigned int’} to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(429,39): warning :   429 |   (*pRepairPacket)->m_pData[23] = row + 1;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(429,39): warning :       |                                   ~~~~^~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(455,44): warning : conversion from ‘uint32_t’ {aka ‘unsigned int’} to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(455,44): warning :   455 |    size[nPackNum] = m_pFecTable[row][col]->m_nLength;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(455,44): warning :       |                     ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(471,39): warning : conversion from ‘uint32_t’ {aka ‘unsigned int’} to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(471,39): warning :   471 |   (*pRepairPacket)->m_pData[22] = col + 1;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(471,39): warning :       |                                   ~~~~^~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(510,50): warning : conversion from ‘int’ to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(510,50): warning :   510 |    uint16_t seq = (packet->m_pData[12 + 8] << 8) | (packet->m_pData[12 + 9]);
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(510,50): warning :       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(551,44): warning : conversion from ‘int’ to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(551,44): warning :   551 |   uint16_t seq = (packet->m_pData[2] << 8) | packet->m_pData[3];
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(551,44): warning :       |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(598,53): warning : conversion from ‘int’ to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(598,53): warning :   598 |   uint16_t baseSeq = (packet->m_pData[12 + 8] << 8) | (packet->m_pData[12 + 9]);
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(598,53): warning :       |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(610,44): warning : conversion from ‘int’ to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(610,44): warning :   610 |   uint16_t seq = (packet->m_pData[2] << 8) | packet->m_pData[3];
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(610,44): warning :       |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(635,45): warning : conversion from ‘uint32_t’ {aka ‘unsigned int’} to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(635,45): warning :   635 |     size[nPackNum] = m_pFecTable[row][col]->m_nLength;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(635,45): warning :       |                      ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(640,43): warning : conversion from ‘uint32_t’ {aka ‘unsigned int’} to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(640,43): warning :   640 |     seq = m_nBaseSeq + row * m_nColumnNum + col;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(640,43): warning :       |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(644,16): warning : comparison of integer expressions of different signedness: ‘uint32_t’ {aka ‘unsigned int’} and ‘int’ [-Wsign-compare]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(644,16): warning :   644 |   if (nPackNum == (m_nColumnNum - 1))
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(644,16): warning :       |       ~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(649,33): warning : conversion from ‘int’ to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(649,33): warning :   649 |     (*packet)->m_pData[2] = seq >> 8;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(649,33): warning :       |                             ~~~~^~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(650,33): warning : conversion from ‘int’ to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(650,33): warning :   650 |     (*packet)->m_pData[3] = seq & 0xff;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(650,33): warning :       |                             ~~~~^~~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(673,45): warning : conversion from ‘uint32_t’ {aka ‘unsigned int’} to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(673,45): warning :   673 |     size[nPackNum] = m_pFecTable[row][col]->m_nLength;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(673,45): warning :       |                      ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(678,43): warning : conversion from ‘uint32_t’ {aka ‘unsigned int’} to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(678,43): warning :   678 |     seq = m_nBaseSeq + row * m_nColumnNum + col;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(678,43): warning :       |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(681,34): warning : conversion from ‘int’ to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(681,34): warning :   681 |      (*packet)->m_pData[2] = seq >> 8;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(681,34): warning :       |                              ~~~~^~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(682,34): warning : conversion from ‘int’ to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(682,34): warning :   682 |      (*packet)->m_pData[3] = seq & 0xff;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(682,34): warning :       |                              ~~~~^~~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(687,16): warning : comparison of integer expressions of different signedness: ‘uint32_t’ {aka ‘unsigned int’} and ‘int’ [-Wsign-compare]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(687,16): warning :   687 |   if (nPackNum == (m_nRowNum - 1))
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(687,16): warning :       |       ~~~~~~~~~^~~~~~~~~~~~~~~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(703,52): warning : conversion from ‘int’ to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(703,52): warning :   703 |  uint16_t nRepairSize = (repair->m_pData[14] << 8) | repair->m_pData[15];
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(703,52): warning :       |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(705,23): warning : comparison of integer expressions of different signedness: ‘int’ and ‘uint32_t’ {aka ‘unsigned int’} [-Wsign-compare]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(705,23): warning :   705 |  if (nPacketSize + 12 > repair->m_nLength)
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(705,23): warning :       |      ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(951,18): warning : conversion from ‘uint32_t’ {aka ‘unsigned int’} to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(951,18): warning :   951 |  uint8_t row = n / m_nColumnNum;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(951,18): warning :       |                ~~^~~~~~~~~~~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(952,33): warning : conversion from ‘uint32_t’ {aka ‘unsigned int’} to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(952,33): warning :   952 |  uint8_t col = n % m_nColumnNum - 1;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(952,33): warning :       |                ~~~~~~~~~~~~~~~~~^~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(969,50): warning : conversion from ‘int32_t’ {aka ‘int’} to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(969,50): warning :   969 |     uint16_t n = m_nBaseSeq + row * m_nColumnNum + c;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(969,50): warning :       |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(980,48): warning : conversion from ‘int32_t’ {aka ‘int’} to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(980,48): warning :   980 |     uint16_t n = m_nBaseSeq + r * m_nColumnNum + col;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(980,48): warning :       |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(996,52): warning : conversion from ‘int32_t’ {aka ‘int’} to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(996,52): warning :   996 |     uint16_t seq = m_nBaseSeq + row * m_nColumnNum + col;
+D:\Xihe\BaseClass\FEC\FEC2DTable.cpp(996,52): warning :       |                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+  FECDecoder.cpp
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(142,43): warning : conversion from ‘int’ to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(142,43): warning :   142 |  uint16_t seq = (packet->m_pData[2] << 8) | packet->m_pData[3];
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(142,43): warning :       |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(411,16): warning : conversion from ‘int’ to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(411,16): warning :   411 |       item.BLP |= (1 << (15 - i));
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(411,16): warning :       |       ~~~~~~~~~^~~~~~~~~~~~~~~~~~
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(432,33): warning : conversion from ‘size_t’ {aka ‘long unsigned int’} to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(432,33): warning :   432 |   nackData[2] = (itemCount + 2) >> 8;
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(432,33): warning :       |                 ~~~~~~~~~~~~~~~~^~~~
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(434,25): warning : conversion from ‘uint32_t’ {aka ‘unsigned int’} to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(434,25): warning :   434 |   nackData[4] = m_nSSRC >> 24;
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(434,25): warning :       |                 ~~~~~~~~^~~~~
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(446,38): warning : conversion from ‘int’ to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(446,38): warning :   446 |    nackData[12 + (i * 4)] = item.PID >> 8;
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(446,38): warning :       |                             ~~~~~~~~~^~~~
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(447,38): warning : conversion from ‘int’ to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(447,38): warning :   447 |    nackData[13 + (i * 4)] = item.PID & 0xff;
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(447,38): warning :       |                             ~~~~~~~~~^~~~~~
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(448,38): warning : conversion from ‘int’ to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(448,38): warning :   448 |    nackData[14 + (i * 4)] = item.BLP >> 8;
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(448,38): warning :       |                             ~~~~~~~~~^~~~
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(449,38): warning : conversion from ‘int’ to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(449,38): warning :   449 |    nackData[15 + (i * 4)] = item.BLP & 0xff;
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(449,38): warning :       |                             ~~~~~~~~~^~~~~~
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(455,24): warning : conversion from ‘size_t’ {aka ‘long unsigned int’} to ‘uint32_t’ {aka ‘unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(455,24): warning :   455 |   (*nack)->m_nLength = nNackPacketSize;
+D:\Xihe\BaseClass\FEC\FECDecoder.cpp(455,24): warning :       |                        ^~~~~~~~~~~~~~~
+  FECEncoder.cpp
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(96,38): warning : conversion from ‘int’ to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(96,38): warning :    96 |  uint16_t itemCount = (nack[2] << 8) | nack[3];
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(96,38): warning :       |                       ~~~~~~~~~~~~~~~^~~~~~~~~
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(97,28): warning : comparison of integer expressions of different signedness: ‘int’ and ‘uint32_t’ {aka ‘unsigned int’} [-Wsign-compare]
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(97,28): warning :    97 |  if (((itemCount + 3) * 4) > packet->m_nLength)
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(97,28): warning :       |      ~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(106,44): warning : conversion from ‘int’ to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(106,44): warning :   106 |   uint16_t PID = (nack[12 + (4 * i)] << 8) | nack[13 + (4 * i)];
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(106,44): warning :       |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(107,44): warning : conversion from ‘int’ to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(107,44): warning :   107 |   uint16_t BLP = (nack[14 + (4 * i)] << 8) | nack[15 + (4 * i)];
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(107,44): warning :       |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(114,28): warning : conversion from ‘int’ to ‘std::__cxx11::list<short unsigned int>::value_type’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(114,28): warning :   114 |     lost.push_back(PID + i + 1);
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(114,28): warning :       |                    ~~~~~~~~^~~
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(153,32): warning : conversion from ‘int’ to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(153,32): warning :   153 |  pRepairPacketData[2] = m_nSeq >> 8;
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(153,32): warning :       |                         ~~~~~~~^~~~
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(154,32): warning : conversion from ‘int’ to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(154,32): warning :   154 |  pRepairPacketData[3] = m_nSeq & 0xff;
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(154,32): warning :       |                         ~~~~~~~^~~~~~
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(155,33): warning : conversion from ‘uint32_t’ {aka ‘unsigned int’} to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(155,33): warning :   155 |  pRepairPacketData[8] = m_nSSRC >> 24;
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(155,33): warning :       |                         ~~~~~~~~^~~~~
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(177,43): warning : conversion from ‘int’ to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(177,43): warning :   177 |  uint16_t seq = (packet->m_pData[2] << 8) | packet->m_pData[3];
+D:\Xihe\BaseClass\FEC\FECEncoder.cpp(177,43): warning :       |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~
+  ImageTransoprt.cpp
+  Log.cpp
+D:\Xihe\BaseClass\Log\Log.cpp(9,2): warning : second parameter of ‘va_start’ not last named argument [-Wvarargs]
+D:\Xihe\BaseClass\Log\Log.cpp(9,2): warning :     9 |  va_start(list, 1);
+D:\Xihe\BaseClass\Log\Log.cpp(9,2): warning :       |  ^~~~~~~~
+D:\Xihe\BaseClass\Log\Log.cpp(21,2): warning : second parameter of ‘va_start’ not last named argument [-Wvarargs]
+D:\Xihe\BaseClass\Log\Log.cpp(21,2): warning :    21 |  va_start(list, 1);
+D:\Xihe\BaseClass\Log\Log.cpp(21,2): warning :       |  ^~~~~~~~
+D:\Xihe\BaseClass\Log\Log.cpp(33,2): warning : second parameter of ‘va_start’ not last named argument [-Wvarargs]
+D:\Xihe\BaseClass\Log\Log.cpp(33,2): warning :    33 |  va_start(list, 1);
+D:\Xihe\BaseClass\Log\Log.cpp(33,2): warning :       |  ^~~~~~~~
+D:\Xihe\BaseClass\Log\Log.cpp(45,2): warning : second parameter of ‘va_start’ not last named argument [-Wvarargs]
+D:\Xihe\BaseClass\Log\Log.cpp(45,2): warning :    45 |  va_start(list, 1);
+D:\Xihe\BaseClass\Log\Log.cpp(45,2): warning :       |  ^~~~~~~~
+D:\Xihe\BaseClass\Log\Log.cpp(57,2): warning : second parameter of ‘va_start’ not last named argument [-Wvarargs]
+D:\Xihe\BaseClass\Log\Log.cpp(57,2): warning :    57 |  va_start(list, 1);
+D:\Xihe\BaseClass\Log\Log.cpp(57,2): warning :       |  ^~~~~~~~
+  VideoCapture.cpp
+  VideoDecoder.cpp
+  VideoEncoder.cpp
+  MP4Reader.cpp
+  MP4Writer.cpp
+  OSD.cpp
+  H264RTPpacketizer.cpp
+D:\Xihe\BaseClass\RTPPacketizer\H264RTPpacketizer.cpp(14,21): warning : conversion from ‘int’ to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\RTPPacketizer\H264RTPpacketizer.cpp(14,21): warning :    14 |  m_nSeqNum = rand() % 65535;
+D:\Xihe\BaseClass\RTPPacketizer\H264RTPpacketizer.cpp(14,21): warning :       |              ~~~~~~~^~~~~~~
+D:\Xihe\BaseClass\RTPPacketizer\H264RTPpacketizer.cpp(111,26): warning : conversion from ‘uint64_t’ {aka ‘long unsigned int’} to ‘uint32_t’ {aka ‘unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\RTPPacketizer\H264RTPpacketizer.cpp(111,26): warning :   111 |  uint32_t time = packet->m_lDTS;
+D:\Xihe\BaseClass\RTPPacketizer\H264RTPpacketizer.cpp(111,26): warning :       |                  ~~~~~~~~^~~~~~
+  H264RTPParser.cpp
+  RTSPServer.cpp
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.h(110,16): warning : ‘int32_t AllocUdpSocket(const string&, uint16_t)’ declared ‘static’ but never defined [-Wunused-function]
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.h(112,16): warning : ‘int32_t GetLocalIPAndPort(int32_t, std::string&, uint16_t&)’ declared ‘static’ but never defined [-Wunused-function]
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.h(114,16): warning : ‘int32_t GetRemoteIPAndPort(int32_t, std::string&, uint16_t&)’ declared ‘static’ but never defined [-Wunused-function]
+  RTSPServerSession.cpp
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(170,11): warning : comparison of integer expressions of different signedness: ‘size_t’ {aka ‘long unsigned int’} and ‘int’ [-Wsign-compare]
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(170,11): warning :   170 |   if (len == -1)
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(170,11): warning :       |       ~~~~^~~~~
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(184,36): warning : conversion from ‘size_t’ {aka ‘long unsigned int’} to ‘uint32_t’ {aka ‘unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(184,36): warning :   184 |    m_SessionBuff.Append(pRecvBuff, len);
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(184,36): warning :       |                                    ^~~
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(285,32): warning : conversion from ‘int’ to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(285,32): warning :   285 |  uint16_t len = ((msg[2] << 8) | msg[3]);
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(285,32): warning :       |                 ~~~~~~~~~~~~~~~^~~~~~~~~
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(286,14): warning : comparison of integer expressions of different signedness: ‘int’ and ‘const uint32_t’ {aka ‘const unsigned int’} [-Wsign-compare]
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(286,14): warning :   286 |  if (len + 4 <= size)
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(286,14): warning :       |      ~~~~~~~~^~~~~~~
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(300,32): warning : conversion from ‘int’ to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(300,32): warning :   300 |  uint16_t len = ((msg[2] << 8) | msg[3]);
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(300,32): warning :       |                 ~~~~~~~~~~~~~~~^~~~~~~~~
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(301,14): warning : comparison of integer expressions of different signedness: ‘int’ and ‘const uint32_t’ {aka ‘const unsigned int’} [-Wsign-compare]
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(301,14): warning :   301 |  if (len + 4 <= size)
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(301,14): warning :       |      ~~~~~~~~^~~~~~~
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(531,12): warning : conversion from ‘ssize_t’ {aka ‘long int’} to ‘int32_t’ {aka ‘int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(531,12): warning :   531 |  ret = send(m_nSessionfd, strMsg.c_str(), strMsg.length(), 0);
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(531,12): warning :       |        ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(550,12): warning : conversion from ‘ssize_t’ {aka ‘long int’} to ‘int32_t’ {aka ‘int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(550,12): warning :   550 |  ret = send(m_nSessionfd, strMsg.c_str(), strMsg.length(), 0);
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(550,12): warning :       |        ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(1104,53): warning : conversion from ‘int’ to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(1104,53): warning :  1104 |   m_nVideoRtpfd = AllocUdpSocket(m_strRemoteIP, atoi(ports[0].c_str()));
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(1104,53): warning :       |                                                 ~~~~^~~~~~~~~~~~~~~~~~
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(1105,54): warning : conversion from ‘int’ to ‘uint16_t’ {aka ‘short unsigned int’} may change value [-Wconversion]
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(1105,54): warning :  1105 |   m_nVideoRtcpfd = AllocUdpSocket(m_strRemoteIP, atoi(ports[1].c_str()));
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(1105,54): warning :       |                                                  ~~~~^~~~~~~~~~~~~~~~~~
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(1197,31): warning : conversion from ‘uint32_t’ {aka ‘unsigned int’} to ‘char’ may change value [-Wconversion]
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(1197,31): warning :  1197 |   temp[2] = packet->m_nLength >> 8;
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(1197,31): warning :       |             ~~~~~~~~~~~~~~~~~~^~~~
+D:\Xihe\BaseClass\RTSPServer\RTSPServerSession.cpp(1047,9): warning : ‘int32_t GetRemoteIPAndPort(int32_t, std::string&, uint16_t&)’ defined but not used [-Wunused-function]
+  main.cpp
+D:\Xihe\XiheServer\..\BaseClass\RTSPServer\RTSPServerSession.h(110,16): warning : ‘int32_t AllocUdpSocket(const string&, uint16_t)’ declared ‘static’ but never defined [-Wunused-function]
+D:\Xihe\XiheServer\..\BaseClass\RTSPServer\RTSPServerSession.h(112,16): warning : ‘int32_t GetLocalIPAndPort(int32_t, std::string&, uint16_t&)’ declared ‘static’ but never defined [-Wunused-function]
+D:\Xihe\XiheServer\..\BaseClass\RTSPServer\RTSPServerSession.h(114,16): warning : ‘int32_t GetRemoteIPAndPort(int32_t, std::string&, uint16_t&)’ declared ‘static’ but never defined [-Wunused-function]
+  XiheServer.cpp
+  正在链接对象
+  XiheServer.vcxproj -> D:\Xihe\XiheServer\bin\ARM\Debug\XiheServer.out
+  正在调用“gpio export 17 out”，工作目录:“/root/projects/XiheServer/XiheServer/”
