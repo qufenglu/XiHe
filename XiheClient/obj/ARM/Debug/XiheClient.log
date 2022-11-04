@@ -1,5 +1,6 @@
-﻿  正在验证源
-  正在将源远程复制到“192.168.5.4”
+﻿  正在清理远程项目目录
+  正在验证源
+  正在将源远程复制到“192.168.5.53”
   正在验证体系结构
   正在验证体系结构
 C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Application Type\Linux\1.0\Linux.targets(202,5): error : 找不到连接

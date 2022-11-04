@@ -1,2 +1,5 @@
-
 .vs/
+XiheClient/bin/
+XiheClient/obj/
+XiheServer/bin/
+XiheServer/obj/
