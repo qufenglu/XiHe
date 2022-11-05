@@ -10,7 +10,7 @@
 #include "VideoCapture.h" 
 #include "Log/Log.h"
 
-#define VIDEO_CAPTURN_BUFF (2)
+#define VIDEO_CAPTURN_BUFF (4)
 #define VIDEO_CLOCK_RATE (90000)
 
 VideoCapture::VideoCapture()
