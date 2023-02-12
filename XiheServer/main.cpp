@@ -1,8 +1,11 @@
 #include <thread>
 #include "XiheServer.h"
+#include "Log/Log.h"
 
 int main(void)
 {
+    InitLog("/usr/XiheServer.txt");
+    SetLogLevel(TRACE);
     //此操作第一次耗时，因此提前
     setlocale(LC_CTYPE, "zh_CN.GB2312");
     mbstowcs(nullptr, "测试", 0);

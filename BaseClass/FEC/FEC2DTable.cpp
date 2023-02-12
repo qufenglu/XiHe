@@ -7,13 +7,6 @@ FEC2DTable::FEC2DTable(uint8_t pt)
     m_nBaseSeq = -1;
     m_nRowNum = 0;
     m_nColumnNum = 0;
-    m_pRowCounter = nullptr;
-    m_pColumnCounter = nullptr;
-    m_pFecTable = nullptr;
-    m_pRowRepairPacket = nullptr;
-    m_pColumnRepairPacket = nullptr;
-    m_pFECPacketCallback = nullptr;
-    m_pRTPPacketCallback = nullptr;
 }
 
 FEC2DTable::~FEC2DTable()
@@ -23,58 +16,17 @@ FEC2DTable::~FEC2DTable()
 
 int32_t FEC2DTable::ReleaseAll()
 {
-    if (m_pFecTable != nullptr)
+    for (auto& item : m_pFecTable)
     {
-        for (uint8_t row = 0; row < m_nRowNum; row++)
-        {
-            if (m_pFecTable[row] != nullptr)
-            {
-                for (uint8_t col = 0; col < m_nColumnNum; col++)
-                {
-                    if (m_pFecTable[row, col] != nullptr)
-                    {
-                        m_pFecTable[row, col] = nullptr;
-                    }
-                }
-
-                delete[] m_pFecTable[row];
-                m_pFecTable[row] = nullptr;
-            }
-        }
-
-        free(m_pFecTable);
-        m_pFecTable = nullptr;
+        item.clear();
     }
+    m_pFecTable.clear();
 
-    free(m_pRowCounter);
-    m_pRowCounter = nullptr;
-    free(m_pColumnCounter);
-    m_pColumnCounter = nullptr;
+    m_pRowCounter.clear();
+    m_pColumnCounter.clear();
 
-    if (m_pRowRepairPacket != nullptr)
-    {
-        for (uint8_t row = 0; row < m_nRowNum; row++)
-        {
-            if (m_pRowRepairPacket[row] != nullptr)
-            {
-                m_pRowRepairPacket[row] = nullptr;
-            }
-        }
-        delete[] m_pRowRepairPacket;
-        m_pRowRepairPacket = nullptr;
-    }
-    if (m_pColumnRepairPacket != nullptr)
-    {
-        for (uint8_t col = 0; col < m_nColumnNum; col++)
-        {
-            if (m_pColumnRepairPacket[col] != nullptr)
-            {
-                m_pColumnRepairPacket[col] = nullptr;
-            }
-        }
-        delete[] m_pColumnRepairPacket;
-        m_pColumnRepairPacket = nullptr;
-    }
+    m_pRowRepairPacket.clear();
+    m_pColumnRepairPacket.clear();
 
     m_nRowNum = 0;
     m_nColumnNum = 0;
@@ -90,65 +42,39 @@ int32_t FEC2DTable::Init(uint8_t row, uint8_t column)
         Error("[%p][FEC2DTable::Init] param row:%d or column:%d err", this, row, column);
         return -1;
     }
+    int32_t ret = -1;
 
     m_nRowNum = row;
     m_nColumnNum = column;
 
-    int32_t ret = -1;
-    size_t nMallocSize = sizeof(uint8_t) * m_nRowNum;
-    m_pRowCounter = (uint8_t*)malloc(nMallocSize);
-    if (m_pRowCounter == nullptr)
+    m_pRowCounter.clear();
+    for (int i = 0; i < m_nRowNum; i++)
     {
-        Error("[%p][FEC2DTable::Init] malloc row counter  fali", this);
-        ret = -2;
-        goto fail;
+        m_pRowCounter.push_back(0);
     }
-    memset(m_pRowCounter, 0, nMallocSize);
+    m_pColumnCounter.clear();
+    for (int i = 0; i < m_nColumnNum; i++)
+    {
+        m_pColumnCounter.push_back(0);
+    }
 
-    nMallocSize = sizeof(uint8_t) * m_nColumnNum;
-    m_pColumnCounter = (uint8_t*)malloc(nMallocSize);
-    if (m_pColumnCounter == nullptr)
+    for (int i = 0; i < m_nRowNum; i++)
     {
-        Error("[%p][FEC2DTable::Init] malloc column counter  fali", this);
-        ret = -3;
-        goto fail;
-    }
-    memset(m_pColumnCounter, 0, nMallocSize);
-
-    nMallocSize = sizeof(std::shared_ptr<Packet>*) * m_nRowNum;
-    m_pFecTable = (std::shared_ptr<Packet>**)malloc(nMallocSize);
-    if (m_pFecTable == nullptr)
-    {
-        Error("[%p][FEC2DTable::Init] malloc fec table  fali", this);
-        ret = -4;
-        goto fail;
-    }
-    memset(m_pFecTable, 0, nMallocSize);
-    for (uint32_t i = 0; i < m_nRowNum; i++)
-    {
-        m_pFecTable[i] = new std::shared_ptr<Packet>[m_nColumnNum]();
-        if (m_pFecTable[i] == nullptr)
+        std::vector<std::shared_ptr<Packet>> packets;
+        for (int j = 0; j < m_nColumnNum; j++)
         {
-            Error("[%p][FEC2DTable::Init] malloc fec table row:%d  fali", this, i);
-            ret = -5;
-            goto fail;
+            packets.push_back(nullptr);
         }
+        m_pFecTable.push_back(packets);
     }
 
-    m_pRowRepairPacket = new std::shared_ptr<Packet>[m_nRowNum]();
-    if (m_pRowRepairPacket == nullptr)
+    for (int i = 0; i < m_nRowNum; i++)
     {
-        Error("[%p][FEC2DTable::Init] malloc row repair packets  fali", this);
-        ret = -6;
-        goto fail;
+        m_pRowRepairPacket.push_back(nullptr);
     }
-
-    m_pColumnRepairPacket = new std::shared_ptr<Packet>[m_nColumnNum]();
-    if (m_pColumnRepairPacket == nullptr)
+    for (int i = 0; i < m_nColumnNum; i++)
     {
-        Error("[%p][FEC2DTable::Init] malloc column repair packets  fali", this);
-        ret = -7;
-        goto fail;
+        m_pColumnRepairPacket.push_back(nullptr);
     }
 
     return 0;
@@ -159,42 +85,30 @@ fail:
 
 void FEC2DTable::ClearTable()
 {
-    if (m_pFecTable != nullptr)
+    for (auto& item : m_pFecTable)
     {
-        for (uint8_t row = 0; row < m_nRowNum; row++)
+        for (auto& item1 : item)
         {
-            if (m_pFecTable[row] != nullptr)
-            {
-                for (uint8_t col = 0; col < m_nColumnNum; col++)
-                {
-                    m_pFecTable[row, col] = nullptr;
-                }
-            }
+            item1 = nullptr;
         }
     }
 
-    if (m_pRowCounter != nullptr)
+    for (int i = 0; i < m_pRowCounter.size(); i++)
     {
-        memset(m_pRowCounter, 0, sizeof(uint32_t) * m_nRowNum);
+        m_pRowCounter[i] = 0;
     }
-    if (m_pColumnCounter != nullptr)
+    for (int i = 0; i < m_pColumnCounter.size(); i++)
     {
-        memset(m_pColumnCounter, 0, sizeof(uint32_t) * m_nColumnNum);
+        m_pColumnCounter[i] = 0;
     }
 
-    if (m_pRowRepairPacket != nullptr)
+    for (auto& item : m_pRowRepairPacket)
     {
-        for (uint8_t row = 0; row < m_nRowNum; row++)
-        {
-            m_pRowRepairPacket[row] = nullptr;
-        }
+        item = nullptr;
     }
-    if (m_pColumnRepairPacket != nullptr)
+    for (auto& item : m_pColumnRepairPacket)
     {
-        for (uint8_t col = 0; col < m_nColumnNum; col++)
-        {
-            m_pColumnRepairPacket[col] = nullptr;
-        }
+        item = nullptr;
     }
 
     m_nBaseSeq = -1;
@@ -251,9 +165,9 @@ void FEC2DTable::CalculateRowAndColumn(uint16_t seq, uint32_t& row, uint32_t& co
     {
         nSeq += 65536;
     }
-    uint32_t n = nSeq - m_nBaseSeq + 1;
+    uint32_t n = nSeq - m_nBaseSeq;
     row = n / m_nColumnNum;
-    col = n % m_nColumnNum - 1;
+    col = n % m_nColumnNum;
 }
 
 int32_t FEC2DTable::RecvPacketAndMakeRepair(const std::shared_ptr<Packet>& packet)
@@ -269,6 +183,7 @@ int32_t FEC2DTable::RecvPacketAndMakeRepair(const std::shared_ptr<Packet>& packe
         uint32_t row = 0;
         uint32_t col = 0;
         CalculateRowAndColumn(seq, row, col);
+
         if (m_pFecTable[row][col] == nullptr)
         {
             m_pFecTable[row][col] = packet;
@@ -277,34 +192,29 @@ int32_t FEC2DTable::RecvPacketAndMakeRepair(const std::shared_ptr<Packet>& packe
 
             if (m_pRowCounter[row] == m_nColumnNum)
             {
-                std::shared_ptr<Packet>* pRepairPacket = CreateRepairPacketByRow(row);
+                std::shared_ptr<Packet> pRepairPacket = CreateRepairPacketByRow(row);
                 if (pRepairPacket == nullptr)
                 {
                     Error("[%p][FEC2DTable::RecvPacketAndMakeRepair] create repair packet by row:%d fail", this, row);
                 }
                 else
                 {
-                    m_pRowRepairPacket[row] = *pRepairPacket;
-                    OutputFECPacket(*pRepairPacket);
-
-                    *pRepairPacket = nullptr;
-                    delete pRepairPacket;
+                    m_pRowRepairPacket[row] = pRepairPacket;
+                    OutputFECPacket(pRepairPacket);
                 }
             }
+
             if (m_pColumnCounter[col] == m_nRowNum)
             {
-                std::shared_ptr<Packet>* pRepairPacket = CreateRepairPacketByColumn(col);
+                std::shared_ptr<Packet> pRepairPacket = CreateRepairPacketByColumn(col);
                 if (pRepairPacket == nullptr)
                 {
                     Error("[%p][FEC2DTable::RecvPacketAndMakeRepair] create repair packet by col:%d fail", this, col);
                 }
                 else
                 {
-                    m_pColumnRepairPacket[col] = *pRepairPacket;
-                    OutputFECPacket(*pRepairPacket);
-
-                    *pRepairPacket = nullptr;
-                    delete pRepairPacket;
+                    m_pColumnRepairPacket[col] = pRepairPacket;
+                    OutputFECPacket(pRepairPacket);
                 }
             }
         }
@@ -318,14 +228,15 @@ int32_t FEC2DTable::RecvPacketAndMakeRepair(const std::shared_ptr<Packet>& packe
     return 0;
 }
 
-std::shared_ptr<Packet>* FEC2DTable::CreateRepairPacket(uint8_t** data, uint16_t* size, uint32_t nPackNum, uint32_t nMaxLen)
+std::shared_ptr<Packet> FEC2DTable::CreateRepairPacket(uint8_t** data, uint16_t* size, uint32_t nPackNum, uint32_t nMaxLen)
 {
+    std::shared_ptr<Packet> pRepairPacket = nullptr;
     size_t nRepairPacketSize = nMaxLen + 12;
     uint8_t* pRepairPacketData = (uint8_t*)malloc(nRepairPacketSize);
     if (pRepairPacketData == nullptr)
     {
         Error("[%p][FEC2DTable::CreateRepairPacketByRow] malloc repair packet fail", this);
-        return nullptr;
+        return pRepairPacket;
     }
     memset(pRepairPacketData, 0, nRepairPacketSize);
 
@@ -382,14 +293,14 @@ std::shared_ptr<Packet>* FEC2DTable::CreateRepairPacket(uint8_t** data, uint16_t
         }
     }
 
-    std::shared_ptr<Packet>* pRepairPacket = new std::shared_ptr<Packet>();
-    (*pRepairPacket)->m_nLength = nRepairPacketSize;
-    (*pRepairPacket)->m_pData = pRepairPacketData;
+    pRepairPacket = std::make_shared<Packet>();
+    pRepairPacket->m_nLength = nRepairPacketSize;
+    pRepairPacket->m_pData = pRepairPacketData;
 
     return pRepairPacket;
 }
 
-std::shared_ptr<Packet>* FEC2DTable::CreateRepairPacketByRow(uint32_t row)
+std::shared_ptr<Packet> FEC2DTable::CreateRepairPacketByRow(uint32_t row)
 {
     if (m_pRowRepairPacket[row] != nullptr)
     {
@@ -400,16 +311,18 @@ std::shared_ptr<Packet>* FEC2DTable::CreateRepairPacketByRow(uint32_t row)
     uint32_t nPackNum = 0;
     uint8_t* data[MAX_FEC_LINE] = { 0 };
     uint16_t size[MAX_FEC_LINE] = { 0 };
+
     for (uint8_t col = 0; col < m_nColumnNum; col++)
     {
-        if (m_pFecTable[row][col] != nullptr)
+        std::shared_ptr<Packet> packet = m_pFecTable[row][col];
+        if (packet != nullptr)
         {
-            if (nMaxLen < m_pFecTable[row][col]->m_nLength)
+            if (nMaxLen < packet->m_nLength)
             {
-                nMaxLen = m_pFecTable[row][col]->m_nLength;
+                nMaxLen = packet->m_nLength;
             }
-            data[nPackNum] = m_pFecTable[row][col]->m_pData;
-            size[nPackNum] = m_pFecTable[row][col]->m_nLength;
+            data[nPackNum] = packet->m_pData;
+            size[nPackNum] = packet->m_nLength;
             nPackNum++;
         }
         else
@@ -422,17 +335,17 @@ std::shared_ptr<Packet>* FEC2DTable::CreateRepairPacketByRow(uint32_t row)
         return nullptr;
     }
 
-    std::shared_ptr<Packet>* pRepairPacket = CreateRepairPacket(data, size, nPackNum, nMaxLen);
+    std::shared_ptr<Packet> pRepairPacket = CreateRepairPacket(data, size, nPackNum, nMaxLen);
     if (pRepairPacket != nullptr)
     {
-        (*pRepairPacket)->m_pData[22] = m_nColumnNum + 1;
-        (*pRepairPacket)->m_pData[23] = row + 1;
+        pRepairPacket->m_pData[22] = m_nColumnNum + 1;
+        pRepairPacket->m_pData[23] = row + 1;
     }
 
     return pRepairPacket;
 }
 
-std::shared_ptr<Packet>* FEC2DTable::CreateRepairPacketByColumn(uint32_t col)
+std::shared_ptr<Packet> FEC2DTable::CreateRepairPacketByColumn(uint32_t col)
 {
     if (m_pColumnRepairPacket[col] != nullptr)
     {
@@ -443,16 +356,18 @@ std::shared_ptr<Packet>* FEC2DTable::CreateRepairPacketByColumn(uint32_t col)
     uint32_t nPackNum = 0;
     uint8_t* data[MAX_FEC_LINE] = { 0 };
     uint16_t size[MAX_FEC_LINE] = { 0 };
+
     for (uint8_t row = 0; row < m_nRowNum; row++)
     {
-        if (m_pFecTable[row][col] != nullptr)
+        std::shared_ptr<Packet> packet = m_pFecTable[row][col];
+        if (packet != nullptr)
         {
-            if (nMaxLen < m_pFecTable[row][col]->m_nLength)
+            if (nMaxLen < packet->m_nLength)
             {
-                nMaxLen = m_pFecTable[row][col]->m_nLength;
+                nMaxLen = packet->m_nLength;
             }
-            data[nPackNum] = m_pFecTable[row][col]->m_pData;
-            size[nPackNum] = m_pFecTable[row][col]->m_nLength;
+            data[nPackNum] = packet->m_pData;
+            size[nPackNum] = packet->m_nLength;
             nPackNum++;
         }
         else
@@ -460,16 +375,12 @@ std::shared_ptr<Packet>* FEC2DTable::CreateRepairPacketByColumn(uint32_t col)
             break;
         }
     }
-    if (nPackNum < m_nRowNum)
-    {
-        return nullptr;
-    }
 
-    std::shared_ptr<Packet>* pRepairPacket = CreateRepairPacket(data, size, nPackNum, nMaxLen);
+    std::shared_ptr<Packet> pRepairPacket = CreateRepairPacket(data, size, nPackNum, nMaxLen);
     if (pRepairPacket != nullptr)
     {
-        (*pRepairPacket)->m_pData[22] = col + 1;
-        (*pRepairPacket)->m_pData[23] = m_nRowNum + 1;
+        pRepairPacket->m_pData[22] = col + 1;
+        pRepairPacket->m_pData[23] = m_nRowNum + 1;
     }
 
     return pRepairPacket;
@@ -487,7 +398,7 @@ void FEC2DTable::OutputRTPPacket(const std::shared_ptr<Packet>& packet)
 {
     if (m_pRTPPacketCallback != nullptr)
     {
-        m_pRTPPacketCallback(packet);
+        m_pRTPPacketCallback(packet, true);
     }
 }
 
@@ -503,6 +414,7 @@ int32_t FEC2DTable::RecvPacketAndTryRepair(const std::shared_ptr<Packet>& packet
     uint32_t row = 0;
     uint32_t col = 0;
     bool bIsRepairPacket = pt == m_nPayloadType ? true : false;
+
     if (bIsRepairPacket)
     {
         if (m_nBaseSeq == -1)
@@ -521,7 +433,7 @@ int32_t FEC2DTable::RecvPacketAndTryRepair(const std::shared_ptr<Packet>& packet
                     this, col, row, m_nColumnNum, m_nRowNum);
                 return -2;
             }
-            if (m_pRowRepairPacket[row] != nullptr)
+            if (m_pRowRepairPacket[row] == nullptr)
             {
                 m_pRowRepairPacket[row] = packet;
             }
@@ -534,7 +446,7 @@ int32_t FEC2DTable::RecvPacketAndTryRepair(const std::shared_ptr<Packet>& packet
                     this, col, row, m_nColumnNum, m_nRowNum);
                 return -3;
             }
-            if (m_pColumnRepairPacket[col] != nullptr)
+            if (m_pColumnRepairPacket[col] == nullptr)
             {
                 m_pColumnRepairPacket[col] = packet;
             }
@@ -558,23 +470,20 @@ int32_t FEC2DTable::RecvPacketAndTryRepair(const std::shared_ptr<Packet>& packet
         }
     }
 
-    std::shared_ptr<Packet>* pFixedPacket = nullptr;
-    pFixedPacket = TryRepairByColumn(col);
+    //PrintfTable();
+
+    std::shared_ptr<Packet> pFixedPacket = TryRepairByColumn(col);
     if (pFixedPacket != nullptr)
     {
-        OutputRTPPacket(*pFixedPacket);
-        RecvPacketAndTryRepair(*pFixedPacket);
-        (*pFixedPacket) = nullptr;
-        delete pFixedPacket;
+        OutputRTPPacket(pFixedPacket);
+        RecvPacketAndTryRepair(pFixedPacket);
     }
 
     pFixedPacket = TryRepairByRow(row);
     if (pFixedPacket != nullptr)
     {
-        OutputRTPPacket(*pFixedPacket);
-        RecvPacketAndTryRepair(*pFixedPacket);
-        (*pFixedPacket) = nullptr;
-        delete pFixedPacket;
+        OutputRTPPacket(pFixedPacket);
+        RecvPacketAndTryRepair(pFixedPacket);
     }
 
     return 0;
@@ -582,11 +491,6 @@ int32_t FEC2DTable::RecvPacketAndTryRepair(const std::shared_ptr<Packet>& packet
 
 bool FEC2DTable::IsCanRecvPacket(const std::shared_ptr<Packet>& packet)
 {
-    if (m_pFecTable == nullptr)
-    {
-        return false;
-    }
-
     uint8_t pt = packet->m_pData[1] & 0x7f;
     if (pt == m_nPayloadType)
     {
@@ -596,17 +500,15 @@ bool FEC2DTable::IsCanRecvPacket(const std::shared_ptr<Packet>& packet)
         }
 
         uint16_t baseSeq = (packet->m_pData[12 + 8] << 8) | (packet->m_pData[12 + 9]);
-        if (m_nBaseSeq == baseSeq)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return m_nBaseSeq == baseSeq;
     }
     else
     {
+        if (m_nBaseSeq == -1)
+        {
+            return false;
+        }
+
         uint16_t seq = (packet->m_pData[2] << 8) | packet->m_pData[3];
         if (!IsSeqInRange(seq))
         {
@@ -617,9 +519,9 @@ bool FEC2DTable::IsCanRecvPacket(const std::shared_ptr<Packet>& packet)
     return true;
 }
 
-std::shared_ptr<Packet>* FEC2DTable::TryRepairByRow(uint32_t row)
+std::shared_ptr<Packet> FEC2DTable::TryRepairByRow(uint32_t row)
 {
-    std::shared_ptr<Packet>* packet = nullptr;
+    std::shared_ptr<Packet> packet = nullptr;
     if (m_pRowCounter[row] == (m_nRowNum - 1) && m_pRowRepairPacket[row] != nullptr)
     {
         uint32_t nPackNum = 0;
@@ -646,8 +548,9 @@ std::shared_ptr<Packet>* FEC2DTable::TryRepairByRow(uint32_t row)
             packet = Repair(data, size, nPackNum, m_pRowRepairPacket[row]);
             if (packet != nullptr)
             {
-                (*packet)->m_pData[2] = seq >> 8;
-                (*packet)->m_pData[3] = seq & 0xff;
+                Debug("[%p][FEC2DTable::TryRepairByRow] repair:%d", this, seq);
+                packet->m_pData[2] = seq >> 8;
+                packet->m_pData[3] = seq & 0xff;
             }
         }
     }
@@ -655,10 +558,10 @@ std::shared_ptr<Packet>* FEC2DTable::TryRepairByRow(uint32_t row)
     return packet;
 }
 
-std::shared_ptr<Packet>* FEC2DTable::TryRepairByColumn(uint32_t col)
+std::shared_ptr<Packet> FEC2DTable::TryRepairByColumn(uint32_t col)
 {
-    std::shared_ptr<Packet>* packet = nullptr;
-    if (m_pColumnCounter[col] == m_nColumnNum && m_pColumnRepairPacket[col] != nullptr)
+    std::shared_ptr<Packet> packet = nullptr;
+    if (m_pColumnCounter[col] == (m_nColumnNum-1) && m_pColumnRepairPacket[col] != nullptr)
     {
         uint32_t nPackNum = 0;
         uint8_t* data[MAX_FEC_LINE] = { 0 };
@@ -676,24 +579,25 @@ std::shared_ptr<Packet>* FEC2DTable::TryRepairByColumn(uint32_t col)
             else
             {
                 seq = m_nBaseSeq + row * m_nColumnNum + col;
-                if (packet != nullptr)
-                {
-                    (*packet)->m_pData[2] = seq >> 8;
-                    (*packet)->m_pData[3] = seq & 0xff;
-                }
             }
         }
 
         if (nPackNum == (m_nRowNum - 1))
         {
             packet = Repair(data, size, nPackNum, m_pColumnRepairPacket[col]);
+            if (packet != nullptr)
+            {
+                Debug("[%p][FEC2DTable::TryRepairByColumn] repair:%d", this, seq);
+                packet->m_pData[2] = seq >> 8;
+                packet->m_pData[3] = seq & 0xff;
+            }
         }
     }
 
     return packet;
 }
 
-std::shared_ptr<Packet>* FEC2DTable::Repair(uint8_t** data, uint16_t* size, uint32_t nPackNum, const std::shared_ptr<Packet>& repair)
+std::shared_ptr<Packet> FEC2DTable::Repair(uint8_t** data, uint16_t* size, uint32_t nPackNum, const std::shared_ptr<Packet>& repair)
 {
     uint16_t nPacketSize = 0;
     for (uint32_t i = 0; i < nPackNum; i++)
@@ -704,17 +608,17 @@ std::shared_ptr<Packet>* FEC2DTable::Repair(uint8_t** data, uint16_t* size, uint
     nPacketSize ^= nRepairSize;
     if (nPacketSize + 12 > repair->m_nLength)
     {
-        Error("[%p][FEC2DTable::Repair] repair size:%d > repair packet size:%d - 12", this, nRepairSize, repair->m_nLength);
+        Error("[%p][FEC2DTable::Repair] repair size:%d > repair packet size:%d - 12", this, nPacketSize, repair->m_nLength);
         return nullptr;
     }
 
-    uint8_t* pPacketData = (uint8_t*)malloc(nRepairSize);
+    uint8_t* pPacketData = (uint8_t*)malloc(nPacketSize);
     if (pPacketData == nullptr)
     {
-        Error("[%p][FEC2DTable::Repair] malloc packet data err,size:%d", this, nRepairSize);
+        Error("[%p][FEC2DTable::Repair] malloc packet data err,size:%d", this, nPacketSize);
         return nullptr;
     }
-    memset(pPacketData, 0, nRepairSize);
+    memset(pPacketData, 0, nPacketSize);
 
     uint8_t nP_X_CC_Byte = 0;		//ÐÞ¸´P¡¢X¡¢CC
     uint8_t nM_PT_Byte;				//ÐÞ¸´M¡¢PT
@@ -751,7 +655,7 @@ std::shared_ptr<Packet>* FEC2DTable::Repair(uint8_t** data, uint16_t* size, uint
 
     for (uint32_t i = 0; i < nPackNum; i++)
     {
-        for (uint16_t j = 12; j < nRepairSize; j++)
+        for (uint16_t j = 12; j < nPacketSize; j++)
         {
             if (j >= size[i])
             {
@@ -762,241 +666,73 @@ std::shared_ptr<Packet>* FEC2DTable::Repair(uint8_t** data, uint16_t* size, uint
         }
     }
 
-    for (int i = 12; i < nRepairSize; i++)
+    for (int i = 12; i < nPacketSize; i++)
     {
         pPacketData[i] ^= repair->m_pData[i + 12];
     }
 
-    std::shared_ptr<Packet>* packet = new std::shared_ptr<Packet>();
-    (*packet)->m_pData = pPacketData;
-    (*packet)->m_nLength = nRepairSize;
+    std::shared_ptr<Packet> packet = std::make_shared<Packet>();
+    packet->m_pData = pPacketData;
+    packet->m_nLength = nPacketSize;
 
     return packet;
 }
 
-void FEC2DTable::GetMinimalRepairSet(std::unordered_set<uint16_t>& repair)
+void FEC2DTable::PrintfTable()
 {
-    repair.clear();
-    if (m_FEC2DBitTable.FillBitTable(*this))
-    {
-        m_FEC2DBitTable.GetMinimalRepairSet(repair);
-    }
-}
+    char temp[128];
+    sprintf(temp, "[%p][FEC2DTable::PrintfTable] base seq:%d\n", this, m_nBaseSeq);
+    std::string msg;
+    msg += temp;
 
-FEC2DTable::FEC2DBitTable::FEC2DBitTable()
-{
-    m_nBaseSeq = -1;
-    m_nRowNum = 0;
-    m_nColumnNum = 0;
-    m_pFecBitTable = nullptr;
-    m_pRowRepairBit = nullptr;
-    m_pColumnRepairBit = nullptr;
-    m_pRowCounter = nullptr;
-    m_pColumnCounter = nullptr;
-}
-
-FEC2DTable::FEC2DBitTable::~FEC2DBitTable()
-{
-    ReleaseAll();
-}
-
-int32_t FEC2DTable::FEC2DBitTable::ReleaseAll()
-{
-    if (m_pFecBitTable != nullptr)
-    {
-        for (int i = 0; i < m_nRowNum; i++)
-        {
-            free(m_pFecBitTable[i]);
-        }
-
-        free(m_pFecBitTable);
-        m_pFecBitTable = nullptr;
-    }
-
-    free(m_pRowRepairBit);
-    m_pRowRepairBit = nullptr;
-    free(m_pColumnRepairBit);
-    m_pColumnRepairBit = nullptr;
-    free(m_pRowCounter);
-    m_pRowCounter = nullptr;
-    free(m_pColumnCounter);
-    m_pColumnCounter = nullptr;
-
-    m_nBaseSeq = -1;
-    m_nRowNum = 0;
-    m_nColumnNum = 0;
-
-    return 0;
-}
-
-bool FEC2DTable::FEC2DBitTable::FillBitTable(const FEC2DTable& table)
-{
-    bool isTableInited = table.m_nBaseSeq == -1 ? false :
-        table.m_nColumnNum == 0 ? false :
-        table.m_nRowNum == 0 ? false :
-        table.m_pFecTable == nullptr ? false :
-        table.m_pColumnRepairPacket == nullptr ? false :
-        table.m_pRowRepairPacket == nullptr ? false : true;
-
-    if (!isTableInited)
-    {
-        return false;
-    }
-
-    if (m_nColumnNum != table.m_nColumnNum || m_nRowNum != table.m_nRowNum)
-    {
-        ReleaseAll();
-        m_nBaseSeq = table.m_nBaseSeq;
-        m_nRowNum = table.m_nRowNum;
-        m_nColumnNum = table.m_nColumnNum;
-
-        m_pFecBitTable = (bool**)malloc(sizeof(bool*) * m_nRowNum);
-        if (m_pFecBitTable == nullptr)
-        {
-            Error("[%p][FEC2DBitTable::FillBitTable] malloc fec bit table fail", this);
-            goto fail;
-        }
-        memset(m_pFecBitTable, 0, sizeof(bool*) * m_nRowNum);
-        for (int i = 0; i < m_nRowNum; i++)
-        {
-            m_pFecBitTable[i] = (bool*)malloc(sizeof(bool) * m_nColumnNum);
-            if (m_pFecBitTable[i] == nullptr)
-            {
-                Error("[%p][FEC2DBitTable::FillBitTable] malloc fec bit table fail", this);
-                goto fail;
-            }
-        }
-        m_pRowRepairBit = (bool*)malloc(sizeof(bool) * m_nRowNum);
-        if (m_pRowRepairBit == nullptr)
-        {
-            Error("[%p][FEC2DBitTable::FillBitTable] malloc row repair bit fail", this);
-            goto fail;
-        }
-        m_pColumnRepairBit = (bool*)malloc(sizeof(bool) * m_nColumnNum);
-        if (m_pColumnRepairBit == nullptr)
-        {
-            Error("[%p][FEC2DBitTable::FillBitTable] malloc column repair bit fail", this);
-            goto fail;
-        }
-        m_pRowCounter = (uint8_t*)malloc(sizeof(uint8_t) * m_nRowNum);
-        if (m_pRowCounter == nullptr)
-        {
-            Error("[%p][FEC2DBitTable::FillBitTable] malloc row counter fail", this);
-            goto fail;
-        }
-        m_pColumnCounter = (uint8_t*)malloc(sizeof(uint8_t) * m_nColumnNum);
-        if (m_pColumnCounter == nullptr)
-        {
-            Error("[%p][FEC2DBitTable::FillBitTable] malloc column counter fail", this);
-            goto fail;
-        }
-    }
-
-    memset(m_pColumnCounter, 0, m_nColumnNum);
-    memset(m_pRowCounter, 0, m_nRowNum);
-
-    for (int i = 0; i < m_nRowNum; i++)
-    {
-        for (int j = 0; j < m_nColumnNum; j++)
-        {
-            if (table.m_pFecTable[i][j] != nullptr)
-            {
-                m_pFecBitTable[i][j] = true;
-                m_pRowCounter[i]++;
-                m_pColumnCounter[j]++;
-            }
-            else
-            {
-                m_pFecBitTable[i][j] = false;
-            }
-        }
-    }
-    for (int i = 0; i < m_nRowNum; i++)
-    {
-        if (table.m_pRowRepairPacket[i] != nullptr)
-        {
-            m_pRowRepairBit[i] = true;
-        }
-        else
-        {
-            m_pRowRepairBit[i] = false;
-        }
-    }
-    for (int i = 0; i < m_nColumnNum; i++)
-    {
-        if (table.m_pColumnRepairPacket[i] != nullptr)
-        {
-            m_pColumnRepairBit[i] = true;
-        }
-        else
-        {
-            m_pColumnRepairBit[i] = false;
-        }
-    }
-
-    return true;
-fail:
-    ReleaseAll();
-    return false;
-}
-
-void  FEC2DTable::FEC2DBitTable::AddBit2Table(uint16_t seq)
-{
-    int32_t nSeq = seq;
-    if (nSeq < m_nBaseSeq)
-    {
-        nSeq += 65536;
-    }
-    uint32_t n = nSeq - m_nBaseSeq + 1;
-    uint8_t row = n / m_nColumnNum;
-    uint8_t col = n % m_nColumnNum - 1;
-
-    if (m_pFecBitTable[row][col])
-    {
-        return;
-    }
-
-    m_pFecBitTable[row][col] = true;
-    m_pRowCounter[row]++;
-    m_pColumnCounter[col]++;
-
-    if (m_pRowRepairBit[row] && m_pRowCounter[row] == m_nRowNum - 1)
-    {
-        for (uint8_t c = 0; c < m_nColumnNum; c++)
-        {
-            if (!m_pFecBitTable[row][c])
-            {
-                uint16_t n = m_nBaseSeq + row * m_nColumnNum + c;
-                AddBit2Table(n);
-            }
-        }
-    }
-    if (m_pColumnRepairBit[col] && m_pColumnCounter[col] == m_nColumnNum - 1)
-    {
-        for (uint8_t r = 0; r < m_nRowNum; r++)
-        {
-            if (!m_pFecBitTable[r][col])
-            {
-                uint16_t n = m_nBaseSeq + r * m_nColumnNum + col;
-                AddBit2Table(n);
-            }
-        }
-    }
-}
-
-void FEC2DTable::FEC2DBitTable::GetMinimalRepairSet(std::unordered_set<uint16_t>& repair)
-{
-    std::unordered_set<uint16_t> lost;
     for (uint8_t row = 0; row < m_nRowNum; row++)
     {
         for (uint8_t col = 0; col < m_nColumnNum; col++)
         {
-            if (!m_pFecBitTable[row][col])
+            if (m_pFecTable[row][col] != nullptr)
             {
-                uint16_t seq = m_nBaseSeq + row * m_nColumnNum + col;
-                lost.insert(seq);
-                AddBit2Table(seq);
+                sprintf(temp, " %5d", m_nBaseSeq + row * (m_nRowNum)+col);
+                msg += temp;
+            }
+            else
+            {
+                msg += " -----";
             }
         }
+
+        if (m_pRowRepairPacket[row] != nullptr)
+        {
+            msg += "   fix";
+        }
+        else
+        {
+            msg += " nofix";
+        }
+
+        sprintf(temp, " %3d", m_pRowCounter[row]);
+        msg += temp;
+        msg += "\n";
     }
+
+    for (uint8_t col = 0; col < m_nColumnNum; col++)
+    {
+        if (m_pColumnRepairPacket[col] != nullptr)
+        {
+            msg += "   fix";
+        }
+        else
+        {
+            msg += " nofix";
+        }
+    }
+    msg += "\n";
+
+    for (uint8_t col = 0; col < m_nColumnNum; col++)
+    {
+        sprintf(temp, "   %3d", m_pColumnCounter[col]);
+        msg += temp;
+    }
+    msg += "\n";
+
+    Debug(msg.c_str());
 }

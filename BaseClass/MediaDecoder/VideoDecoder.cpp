@@ -81,7 +81,11 @@ int32_t VideoDecoder::AddVideoStream(const VideoInfo& info)
         }
 
         m_pAVCodec = info.m_nCodecID == AV_CODEC_ID_H264 ? avcodec_find_decoder_by_name("h264_v4l2m2m") :
-            avcodec_find_decoder((AVCodecID)info.m_nCodecID);
+            info.m_nCodecID == AV_CODEC_ID_H265 ? avcodec_find_decoder_by_name("h265_v4l2m2m") : nullptr;
+        if (m_pAVCodec == nullptr)
+        {
+            m_pAVCodec = avcodec_find_decoder((AVCodecID)info.m_nCodecID);
+        }
         if (m_pAVCodec == nullptr)
         {
             DestroyDecoder();

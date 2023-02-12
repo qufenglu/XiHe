@@ -1,13 +1,21 @@
 ﻿#include <thread>
 #include "XiheClient.h"
+#include "Log/Log.h"
 
+int count = 0;
 void OnVideo(std::shared_ptr<VideoFrame>& video)
 {
-    int i = 0;
+    count++;
+    if (count % 25 == 0)
+    {
+        Trace("Rend video:%d", count);
+    }
 }
 
 int main(void)
 {
+    InitLog("/usr/XiheClient.txt");
+    SetLogLevel(TRACE);
     XIheClient* pXIheClient = new XIheClient("127.0.0.1", 7777);
     VideoDecoder::VideoFrameCallbaclk pVideoCallback = std::bind(&OnVideo, std::placeholders::_1);
     pXIheClient->SetVideoFrameCallback(pVideoCallback);

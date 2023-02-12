@@ -24,10 +24,12 @@ public:
 private:
     int32_t ReleaseAll();
     int32_t OutNackPacketIfNeed();
-    std::shared_ptr<Packet>* MakeNackPacket();
-    void OnRTPPacket(const std::shared_ptr<Packet>& packet);
+    std::shared_ptr<Packet> MakeNackPacket();
+    void OnRTPPacket(const std::shared_ptr<Packet>& packet, bool isOutByRepair = false);
     void OutPacketThread();
-    void SkipPackets();
+    bool SkipPackets();
+    bool IsHasRecvPacket(uint16_t seq);
+    void RecvCachePacket(FEC2DTable* pFEC2DTable);
 
 private:
     uint8_t m_nPayloadType;
@@ -38,11 +40,12 @@ private:
     FECDecoderPacketCallback m_pDecoderPacketCallback;
     NackPacketCallback m_pNackPacketCallback;
 
-    bool m_bRecvFtrstPacket;
-    uint16_t m_nLastOutSeq;
+    bool m_bRecvFirstPacket;
+    uint16_t m_nExpOutSeq;
     uint16_t m_nLastRecvSeq;
+    uint16_t m_nLastOutSeq;
     std::mutex m_pRTPSortArrayLock;
-    std::shared_ptr<Packet>* m_pRTPSortArray;
+    std::vector< std::shared_ptr<Packet>>m_pRTPSortArray;
 
     bool m_bStopOutPacket;
     std::thread* m_pOutPacketThread;

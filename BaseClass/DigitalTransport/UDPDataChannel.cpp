@@ -218,7 +218,7 @@ fail:
 
 int32_t UDPDataChannel::MsgThread()
 {
-    int len = 0;
+    ssize_t len = 0;
     const size_t nBuffSize = 4 * 1024;
     uint8_t* pBuff = (uint8_t*)malloc(nBuffSize);
     if (pBuff == nullptr)

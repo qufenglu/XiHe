@@ -5,13 +5,15 @@
 
 #define MAX_CAPTURE_VIDEO_NUM (1)
 
-ImageTransoprt::ImageTransoprt()
+ImageTransoprt::ImageTransoprt(bool enableFec)
 {
+    m_bEnableFec = enableFec;
     m_bEnableOSD = false;
     m_pVideoCapture = nullptr;
     m_pVideoEncoder = nullptr;
     m_pVideoDecoder = nullptr;
     m_pRTPPacketizer = nullptr;
+    m_pFECEncoder = nullptr;
     m_bStopTransoprt = true;
 
     m_pTransoprtThread = nullptr;
@@ -65,6 +67,8 @@ int32_t ImageTransoprt::ReleaseAll()
     m_pVideoEncoder = nullptr;
     delete m_pVideoDecoder;
     m_pVideoDecoder = nullptr;
+    delete m_pFECEncoder;
+    m_pFECEncoder = nullptr;
     delete m_pRTPPacketizer;
     m_pRTPPacketizer = nullptr;
 
@@ -144,7 +148,7 @@ int32_t ImageTransoprt::StartTransoprt(std::string device, const VideoCapture::V
 
 
     VideoEncoder::EncodParam encodParam;
-    encodParam.m_nBitRate = 2 * 1024 * 1024;
+    encodParam.m_nBitRate = 6 * 1024 * 1024;
     encodParam.m_nHeight = capability.m_nHeight;
     encodParam.m_nWidth = capability.m_nWidth;
 
@@ -168,6 +172,22 @@ int32_t ImageTransoprt::StartTransoprt(std::string device, const VideoCapture::V
     m_pRTPPacketizer->SetSSRC(0x12345678);
     RTPPacketizer::RtpPacketCallbaclk pRtpPacketCallbaclk = std::bind(&ImageTransoprt::OnRecvRtpPacket, this, std::placeholders::_1, std::placeholders::_2);
     m_pRTPPacketizer->SetRtpPacketCallbaclk(pRtpPacketCallbaclk);
+
+    if (m_bEnableFec)
+    {
+        m_pFECEncoder = new RFC8627FECEncoder();
+        m_pFECEncoder->SetPayloadType(109);
+        m_pFECEncoder->SetSSRC(0x23456789);
+        ret = m_pFECEncoder->Init(7, 7);
+        if (ret < 0)
+        {
+            Error("[%p][ImageTransoprt::StartTransoprt] init RFC8627FECEncoder fail,return:%d", this, ret);
+            ReleaseAll();
+            return -5;
+        }
+        RFC8627FECEncoder::FECEncoderPacketCallback pFECEncoderPacketCallback = std::bind(&ImageTransoprt::OnRecvFECEncoderPacket, this, std::placeholders::_1);
+        m_pFECEncoder->SetFECEncoderPacketCallback(pFECEncoderPacketCallback);
+    }
 
     {
         const uint8_t* data = nullptr;
@@ -193,7 +213,7 @@ int32_t ImageTransoprt::StartTransoprt(std::string device, const VideoCapture::V
         {
             Error("[%p][ImageTransoprt::StartTransoprt] StartCapture video fail,return:%d", this, ret);
             ReleaseAll();
-            return -4;
+            return -6;
         }
     }
 
@@ -258,11 +278,6 @@ bool ImageTransoprt::SetRtpPacketCallbaclk(ImageTransoprt::RtpPacketCallbaclk ca
 
 void ImageTransoprt::OnRecvRtpPacket(uint8_t* pRtpPacket, uint32_t size)
 {
-    if (m_pRtpPacketCallbaclk == nullptr)
-    {
-        return;
-    }
-
     uint8_t* data = (uint8_t*)malloc(size);
     if (data == nullptr)
     {
@@ -274,9 +289,30 @@ void ImageTransoprt::OnRecvRtpPacket(uint8_t* pRtpPacket, uint32_t size)
     std::shared_ptr<Packet> pRTPPacke = std::make_shared<Packet>();
     pRTPPacke->m_pData = data;
     pRTPPacke->m_nLength = size;
-    m_pRtpPacketCallbaclk(pRTPPacke);
+    if (m_bEnableFec)
+    {
+        if (m_pFECEncoder != nullptr)
+        {
+            m_pFECEncoder->RecvRTPPacket(pRTPPacke);
+        }
+    }
+    else
+    {
+        if (m_pRtpPacketCallbaclk != nullptr)
+        {
+            m_pRtpPacketCallbaclk(pRTPPacke);
+        }
+    }
+}
 
-    pRTPPacke = nullptr;
+void ImageTransoprt::OnRecvFECEncoderPacket(const std::shared_ptr<Packet>& packet)
+{
+    if (m_pRtpPacketCallbaclk == nullptr)
+    {
+        return;
+    }
+
+    m_pRtpPacketCallbaclk(packet);
 }
 
 int32_t ImageTransoprt::StopTransoprt(std::string device)

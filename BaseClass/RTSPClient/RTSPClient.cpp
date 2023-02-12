@@ -13,7 +13,7 @@
 #define RECV_BUFF_SIZE (1024*4)
 #define HEART_BEAT_CYCLE (15*1000)
 #define HEART_BEAT_TIMEOUT (60*1000)
-#define RECV_TIMEOUT 200000
+#define RECV_TIMEOUT 10*1000
 
 RTSPClient::RTSPClient()
 {
@@ -26,6 +26,7 @@ RTSPClient::RTSPClient()
     m_strPlayUrl = "";
     m_nSeq = 0;
     m_bIsRecord = false;
+    m_bEnableFec = false;
 
     m_bSetupVideo = false;
     m_bSetupAudio = false;
@@ -43,6 +44,7 @@ RTSPClient::RTSPClient()
     m_nAudioRtcpfd = -1;
 
     m_pVideoParser = nullptr;
+    m_pFECDecoder = nullptr;
     m_pAudioParser = nullptr;
     m_pVideoPacketCallbaclk = nullptr;
     m_pAudioPacketCallbaclk = nullptr;
@@ -128,16 +130,12 @@ int32_t RTSPClient::ReleaseAll()
     m_nSeq = 0;
     m_strSessionId = "";
 
-    if (m_pAudioParser != nullptr)
-    {
-        delete m_pAudioParser;
-        m_pAudioParser = nullptr;
-    }
-    if (m_pVideoParser != nullptr)
-    {
-        delete m_pVideoParser;
-        m_pVideoParser = nullptr;
-    }
+    delete m_pAudioParser;
+    m_pAudioParser = nullptr;
+    delete m_pVideoParser;
+    m_pVideoParser = nullptr;
+    delete m_pFECDecoder;
+    m_pFECDecoder = nullptr;
 
     return 0;
 }
@@ -308,7 +306,7 @@ void RTSPClient::ClientThread()
     while (!m_bCloseClient)
     {
         m_bNeedWait = false;
-        size_t len = recv(m_nClientSocketfd, pRecvBuff, RECV_BUFF_SIZE, 0);
+        ssize_t len = recv(m_nClientSocketfd, pRecvBuff, RECV_BUFF_SIZE, 0);
         if (len == -1)
         {
             int err = errno;
@@ -1222,6 +1220,20 @@ int32_t RTSPClient::Setup(int32_t trackid)
         }
         m_pVideoParser = m_eVideoFormat == AV_CODEC_ID_H264 ? new H264RTPParser() : nullptr;
         m_pVideoParser->SetPacketCallbaclk(m_pVideoPacketCallbaclk);
+
+        delete m_pFECDecoder;
+        if (m_eVideoTransport == UDP)
+        {
+            m_bEnableFec = true;
+            m_pFECDecoder = new RFC8627FECDecoder();
+            RFC8627FECDecoder::FECDecoderPacketCallback pFECDecoderPacketCallback = std::bind(&RTSPClient::OnRecvFECDecoderPacket, this, std::placeholders::_1);
+            m_pFECDecoder->SetDecoderPacketCallback(pFECDecoderPacketCallback);
+            RFC8627FECDecoder::NackPacketCallback pNackPacketCallback = std::bind(&RTSPClient::OnRecvNackPacket, this, std::placeholders::_1);
+            m_pFECDecoder->SetNackPacketCallback(pNackPacketCallback);
+            m_pFECDecoder->SetPayloadType(109);
+            m_pFECDecoder->SetSSRC(0x23456789);
+            m_pFECDecoder->Init(7, 7, 5);
+        }
     }
     else
     {
@@ -1423,21 +1435,48 @@ int32_t GetRemoteIPAndPort(int32_t fd, std::string& ip, uint16_t& port)
 
 int32_t RTSPClient::OnRecvVideo(uint8_t* const  msg, const uint32_t size)
 {
-    if (m_pVideoParser != nullptr)
+    uint8_t* data = (uint8_t*)malloc(size);
+    if (data == nullptr)
     {
-        uint8_t* data = (uint8_t*)malloc(size);
-        if (data != nullptr)
+        Error("[%p][RTSPClient::OnRecvVideo] malloc data fail", this);
+        return -1;
+    }
+    memcpy(data, msg, size);
+    std::shared_ptr<Packet> packet = std::make_shared<Packet>();
+    packet->m_pData = data;
+    packet->m_nLength = size;
+
+    if (m_bEnableFec)
+    {
+        if (m_pFECDecoder != nullptr)
         {
-            memcpy(data, msg, size);
-            std::shared_ptr<Packet> packet = std::make_shared<Packet>();
-            packet->m_pData = data;
-            packet->m_nLength = size;
-            m_pVideoParser->RecvPacket(packet);
-            packet = nullptr;
+            m_pFECDecoder->RecvPacket(packet);
         }
     }
+    else
+    {
+        if (m_pVideoParser != nullptr)
+        {
+            m_pVideoParser->RecvPacket(packet);
+        }
+    }
+
     return 0;
 }
+
+void RTSPClient::OnRecvFECDecoderPacket(const std::shared_ptr<Packet>& packet)
+{
+    if (m_pVideoParser != nullptr)
+    {
+        m_pVideoParser->RecvPacket(packet);
+    }
+}
+
+void RTSPClient::OnRecvNackPacket(const std::shared_ptr<Packet>& packet)
+{
+
+}
+
 
 int32_t RTSPClient::OnRecvAudio(uint8_t* const  msg, const uint32_t size)
 {
@@ -1467,7 +1506,7 @@ int32_t RTSPClient::RecvUDPMedia(uint8_t* pRecvBuff, int32_t size)
     int32_t nRecv = 0;
     if (m_nVideoRtpfd != -1)
     {
-        size_t len = recv(m_nVideoRtpfd, pRecvBuff, size, 0);
+        ssize_t len = recv(m_nVideoRtpfd, pRecvBuff, size, 0);
         if (len > 0)
         {
             OnRecvVideo(pRecvBuff, len);
@@ -1477,7 +1516,7 @@ int32_t RTSPClient::RecvUDPMedia(uint8_t* pRecvBuff, int32_t size)
 
     if (m_nAudioRtpfd != -1)
     {
-        size_t len = recv(m_nAudioRtpfd, pRecvBuff, size, 0);
+        ssize_t len = recv(m_nAudioRtpfd, pRecvBuff, size, 0);
         if (len > 0)
         {
             OnRecvAudio(pRecvBuff, len);

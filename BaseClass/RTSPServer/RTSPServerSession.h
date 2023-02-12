@@ -60,7 +60,7 @@ private:
     int32_t SetupVideo(const RtspParser::RtspRequest& req);
     int32_t SetupAudio(const RtspParser::RtspRequest& req);
 
-    void OnRecvVideoPacket(std::shared_ptr<Packet>& packet);
+    void OnRecvVideoPacket(const std::shared_ptr<Packet>& packet);
     void SendMediaThread();
     int32_t SendVideo(bool& bHasSend);
     int32_t SendAudio(bool& bHasSend);

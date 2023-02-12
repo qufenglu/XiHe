@@ -116,7 +116,7 @@ std::list<VideoCapture::VideoCaptureCapability*>* VideoCapture::GetDeviceCapabil
                     cap->m_nHeight = video_fmt.fmt.pix.height;
                     cap->m_nVideoType = videoFormats[fmts];
 
-                    cap->m_nFPS = 30;
+                    cap->m_nFPS = 25;
                     result->push_back(cap);
                 }
             }
@@ -292,6 +292,7 @@ void VideoCapture::VideoCaptureThread()
         }
         frame->m_lPTS = m_nFrameTime;
         m_nFrameTime += m_nTimePerFrame;
+
         m_pCaptureVideoCallbaclk(frame);
         frame = nullptr;
 

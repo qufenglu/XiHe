@@ -1,5 +1,6 @@
 #pragma once
 #include <list>
+#include <mutex>
 #include <unordered_map>
 #include "Common.h"
 #include "FEC2DTable.h"
@@ -32,6 +33,7 @@ private:
     FEC2DTable* m_pFEC2DTable;
     FECEncoderPacketCallback m_pEncoderPacketCallback;
 
-    std::list<uint16_t> m_CacheList;
-    std::unordered_map<uint16_t, std::shared_ptr<Packet>> m_CacheMap;
+    std::list<uint16_t> m_cCacheList;
+    std::unordered_map<uint16_t, std::shared_ptr<Packet>> m_cCacheMap;
+    std::mutex m_cCachePacketLock;
 };

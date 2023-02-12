@@ -20,10 +20,13 @@ RFC8627FECEncoder::~RFC8627FECEncoder()
 
 int32_t RFC8627FECEncoder::ReleaseAll()
 {
-    if (m_pFEC2DTable != nullptr)
+    delete m_pFEC2DTable;
+    m_pFEC2DTable = nullptr;
+
     {
-        delete m_pFEC2DTable;
-        m_pFEC2DTable = nullptr;
+        std::lock_guard<std::mutex> lock(m_cCachePacketLock);
+        m_cCacheList.clear();
+        m_cCacheMap.clear();
     }
 
     return 0;
@@ -33,6 +36,7 @@ int32_t RFC8627FECEncoder::Init(uint8_t row, uint8_t col)
 {
     Trace("[%p][RFC8627FECEncoder::Init] Init col:%d row:%d", this, row, col);
 
+    int32_t nFailRet = 0;
     if (m_pFEC2DTable != nullptr)
     {
         Error("[%p][RFC8627FECEncoder::Init] FEC2DTable is not null", this);
@@ -44,28 +48,32 @@ int32_t RFC8627FECEncoder::Init(uint8_t row, uint8_t col)
     if (ret != 0)
     {
         Error("[%p][RFC8627FECEncoder::Init] Init FEC2DTable err,return:%d", this, ret);
-        ReleaseAll();
-        return -2;
+        nFailRet = -2;
+        goto fail;
     }
-    FEC2DTable::FECPacketCallback calbbback1 = std::bind(&RFC8627FECEncoder::OnFECPacket, this, std::placeholders::_1);
-    m_pFEC2DTable->SetFECPacketCallback(calbbback1);
-    FEC2DTable::RTPPacketCallback calbbback2 = std::bind(&RFC8627FECEncoder::OnRTPPacket, this, std::placeholders::_1);
-    m_pFEC2DTable->SetRTPPacketCallback(calbbback2);
 
-    m_CacheMap.reserve(MAX_CACHE_NAM);
+    m_pFEC2DTable->SetFECPacketCallback(std::bind(&RFC8627FECEncoder::OnFECPacket, this, std::placeholders::_1));
+    m_pFEC2DTable->SetRTPPacketCallback(std::bind(&RFC8627FECEncoder::OnRTPPacket, this, std::placeholders::_1));
+
+    m_cCacheMap.reserve(MAX_CACHE_NAM);
 
     return 0;
+fail:
+    ReleaseAll();
+    return ret;
 }
 
 bool RFC8627FECEncoder::SetFECEncoderPacketCallback(FECEncoderPacketCallback callback)
 {
-    if (m_pFEC2DTable == nullptr)
+    m_pEncoderPacketCallback = callback;
+    /*if (m_pFEC2DTable == nullptr)
     {
-        Error("[%p][RFC8627FECEncoder::SetFECPacketCallback] FEC2DTable is not null", this);
+        Error("[%p][RFC8627FECEncoder::SetFECPacketCallback] FEC2DTable is  null", this);
         return false;
     }
 
-    return m_pFEC2DTable->SetFECPacketCallback(callback);
+    return m_pFEC2DTable->SetFECPacketCallback(callback);*/
+    return true;
 }
 
 int32_t RFC8627FECEncoder::RecvRTPPacket(const std::shared_ptr<Packet>& packet)
@@ -117,11 +125,14 @@ int32_t RFC8627FECEncoder::RecvNackPacket(const std::shared_ptr<Packet>& packet)
         }
     }
 
-    for (auto& seq : lost)
     {
-        if (m_CacheMap.find(seq) != m_CacheMap.end())
+        std::lock_guard<std::mutex> lock(m_cCachePacketLock);
+        for (auto& seq : lost)
         {
-            OnRTPPacket(m_CacheMap[seq]);
+            if (m_cCacheMap.find(seq) != m_cCacheMap.end())
+            {
+                OnRTPPacket(m_cCacheMap.at(seq));
+            }
         }
     }
 
@@ -175,18 +186,19 @@ void RFC8627FECEncoder::OnRTPPacket(const std::shared_ptr<Packet>& packet)
 void RFC8627FECEncoder::CacheRTPPacket(const std::shared_ptr<Packet>& packet)
 {
     uint16_t seq = (packet->m_pData[2] << 8) | packet->m_pData[3];
-    if (m_CacheMap.find(seq) == m_CacheMap.end())
     {
-        m_CacheMap[seq] = packet;
-        m_CacheList.push_back(seq);
-
-        while (m_CacheList.size() > MAX_CACHE_NAM)
+        std::lock_guard<std::mutex> lock(m_cCachePacketLock);
+        if (m_cCacheMap.find(seq) == m_cCacheMap.end())
         {
-            uint16_t nRemoveSeq = m_CacheList.front();
-            m_CacheList.pop_front();
-            std::shared_ptr<Packet> removePacket = m_CacheMap[nRemoveSeq];
-            m_CacheMap.erase(nRemoveSeq);
-            removePacket = nullptr;
+            m_cCacheMap.insert({ seq ,packet });
+            m_cCacheList.push_back(seq);
+
+            while (m_cCacheList.size() > MAX_CACHE_NAM)
+            {
+                uint16_t nRemoveSeq = m_cCacheList.front();
+                m_cCacheList.pop_front();
+                m_cCacheMap.erase(nRemoveSeq);
+            }
         }
     }
 }

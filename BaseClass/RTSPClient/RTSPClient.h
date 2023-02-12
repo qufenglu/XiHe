@@ -8,6 +8,7 @@
 #include "CommonTools/ExBuff.h"
 #include "CommonTools/RtspParser.h"
 #include "RTPParser/RTPParser.h"
+#include "FEC/FECDecoder.h"
 
 extern "C" {
 #include "libavcodec/codec.h"
@@ -74,6 +75,9 @@ private:
     int32_t OnRecvAudio(uint8_t* const  msg, const uint32_t size);
     int32_t RecvUDPMedia(uint8_t* pRecvBuff, int32_t size);
 
+    void OnRecvFECDecoderPacket(const std::shared_ptr<Packet>& packet);
+    void OnRecvNackPacket(const std::shared_ptr<Packet>& packet);
+
 private:
     typedef  enum TransportType
     {
@@ -94,6 +98,7 @@ private:
     uint32_t m_nSeq;
     std::string m_strSessionId;
     bool m_bIsRecord;
+    bool m_bEnableFec;
 
     ExBuff m_ClientBuff;
     TimeCounter m_HeartBeatCycleTimer;
@@ -123,6 +128,7 @@ private:
     int32_t m_nAudioRtcpfd;
 
     RTPParser* m_pVideoParser;
+    RFC8627FECDecoder* m_pFECDecoder;
     RTPParser* m_pAudioParser;
     RTPParser::MediaPacketCallbaclk m_pVideoPacketCallbaclk;
     RTPParser::MediaPacketCallbaclk m_pAudioPacketCallbaclk;

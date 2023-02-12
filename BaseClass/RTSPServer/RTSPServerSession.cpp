@@ -170,7 +170,7 @@ void RTSPServerSession::SessionThread()
     {
         m_bNeedWait = false;
 
-        size_t len = recv(m_nSessionfd, pRecvBuff, RECV_BUFF_SIZE, 0);
+        ssize_t len = recv(m_nSessionfd, pRecvBuff, RECV_BUFF_SIZE, 0);
         if (len == -1)
         {
             int err = errno;
@@ -720,7 +720,8 @@ int32_t RTSPServerSession::HandlePlayRequest(const RtspParser::RtspRequest& req)
     capability.m_nVideoType = V4L2_PIX_FMT_MJPEG;
 
     delete m_pImageTransoprt;
-    m_pImageTransoprt = new ImageTransoprt();
+    bool bIsEnableFec = m_eVideoTransport == UDP ? true : false;
+    m_pImageTransoprt = new ImageTransoprt(bIsEnableFec);
     int ret = m_pImageTransoprt->StartTransoprt(m_strResouce, capability);
     if (ret != 0)
     {
@@ -1137,7 +1138,7 @@ int32_t RTSPServerSession::SetupAudio(const RtspParser::RtspRequest& req)
     return -1;
 }
 
-void RTSPServerSession::OnRecvVideoPacket(std::shared_ptr<Packet>& packet)
+void RTSPServerSession::OnRecvVideoPacket(const std::shared_ptr<Packet>& packet)
 {
     bool bHasDiscard = false;
     {

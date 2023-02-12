@@ -6,14 +6,15 @@
 #include "MediaEncoder/VideoEncoder.h"
 #include "RTPPacketizer/RTPPacketizer.h"
 #include "OSD/OSD.h"
+#include "FEC/FECEncoder.h"
 
 class ImageTransoprt
 {
 public:
-    typedef std::function<void(std::shared_ptr<Packet>&)> RtpPacketCallbaclk;
+    typedef std::function<void(const std::shared_ptr<Packet>&)> RtpPacketCallbaclk;
 
 public:
-    ImageTransoprt();
+    ImageTransoprt(bool enableFec);
     ~ImageTransoprt();
 
     int32_t StartTransoprt(std::string device, const VideoCapture::VideoCaptureCapability& capability);
@@ -40,6 +41,7 @@ private:
     void OnRecvDecodedFrame(std::shared_ptr<VideoFrame>& pVido);
     void OnRecvEncodedPacket(std::shared_ptr<VideoPacket>& pVideo);
     void OnRecvRtpPacket(uint8_t* pRtpPacket, uint32_t size);
+    void OnRecvFECEncoderPacket(const std::shared_ptr<Packet>& packet);
 
 private:
     OSD m_cOSD;
@@ -49,11 +51,13 @@ private:
     VideoEncoder* m_pVideoEncoder;
     VideoDecoder* m_pVideoDecoder;
     RTPPacketizer* m_pRTPPacketizer;
+    RFC8627FECEncoder* m_pFECEncoder;
 
     bool m_bStopTransoprt;
     std::thread* m_pDecodeThread;
     std::thread* m_pEncoderThread;
     std::thread* m_pTransoprtThread;
+    bool m_bEnableFec;
 
     std::mutex m_CaptureVideoListLock;
     std::list <std::shared_ptr<VideoFrame>> m_CaptureVideoList;
