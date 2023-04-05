@@ -4,10 +4,12 @@
 #include <chrono>
 #include <ratio>
 #include <iostream>
+#include <mutex>
 #include "Log.h"
 
 FILE* g_pLogFile = nullptr;
 LogLevel g_eLogLevel = DEBUG;
+std::mutex g_cLogLock;
 
 int32_t InitLog(std::string path)
 {
@@ -75,17 +77,21 @@ void Error(const char* format, ...)
         return;
     }
 
-    char buff[64];
-    GetTimeStr(buff, 64);
-    std::cout << buff << " [E] ";
+    {
+        char buff[64];
+        GetTimeStr(buff, 64);
 
-    va_list list;
-    va_start(list, 1);
-    vprintf(format, list);
-    printf("\n");
-    va_end(list);
+        std::lock_guard<std::mutex> lock(g_cLogLock);
+        std::cout << buff << " [E] ";
 
-    std::cout.flush();
+        va_list list;
+        va_start(list, 1);
+        vprintf(format, list);
+        printf("\n");
+        va_end(list);
+
+        std::cout.flush();
+    }
 }
 
 void Warn(const char* format, ...)
@@ -95,17 +101,21 @@ void Warn(const char* format, ...)
         return;
     }
 
-    char buff[64];
-    GetTimeStr(buff, 64);
-    std::cout << buff << " [W] ";
+    {
+        char buff[64];
+        GetTimeStr(buff, 64);
 
-    va_list list;
-    va_start(list, 1);
-    vprintf(format, list);
-    printf("\n");
-    va_end(list);
+        std::lock_guard<std::mutex> lock(g_cLogLock);
+        std::cout << buff << " [W] ";
 
-    std::cout.flush();
+        va_list list;
+        va_start(list, 1);
+        vprintf(format, list);
+        printf("\n");
+        va_end(list);
+
+        std::cout.flush();
+    }
 }
 
 void Trace(const char* format, ...)
@@ -115,17 +125,21 @@ void Trace(const char* format, ...)
         return;
     }
 
-    char buff[64];
-    GetTimeStr(buff, 64);
-    std::cout << buff << " [T] ";
+    {
+        char buff[64];
+        GetTimeStr(buff, 64);
 
-    va_list list;
-    va_start(list, 1);
-    vprintf(format, list);
-    printf("\n");
-    va_end(list);
+        std::lock_guard<std::mutex> lock(g_cLogLock);
+        std::cout << buff << " [T] ";
 
-    std::cout.flush();
+        va_list list;
+        va_start(list, 1);
+        vprintf(format, list);
+        printf("\n");
+        va_end(list);
+
+        std::cout.flush();
+    }
 }
 
 void Debug(const char* format, ...)
@@ -135,17 +149,21 @@ void Debug(const char* format, ...)
         return;
     }
 
-    char buff[64];
-    GetTimeStr(buff, 64);
-    std::cout << buff << " [D] ";
+    {
+        char buff[64];
+        GetTimeStr(buff, 64);
 
-    va_list list;
-    va_start(list, 1);
-    vprintf(format, list);
-    printf("\n");
-    va_end(list);
+        std::lock_guard<std::mutex> lock(g_cLogLock);
+        std::cout << buff << " [D] ";
 
-    std::cout.flush();
+        va_list list;
+        va_start(list, 1);
+        vprintf(format, list);
+        printf("\n");
+        va_end(list);
+
+        std::cout.flush();
+    }
 }
 
 void Panic(const char* format, ...)
@@ -155,15 +173,19 @@ void Panic(const char* format, ...)
         return;
     }
 
-    char buff[64];
-    GetTimeStr(buff, 64);
-    std::cout << buff << " [P] ";
+    {
+        char buff[64];
+        GetTimeStr(buff, 64);
 
-    va_list list;
-    va_start(list, 1);
-    vprintf(format, list);
-    printf("\n");
-    va_end(list);
+        std::lock_guard<std::mutex> lock(g_cLogLock);
+        std::cout << buff << " [P] ";
 
-    std::cout.flush();
+        va_list list;
+        va_start(list, 1);
+        vprintf(format, list);
+        printf("\n");
+        va_end(list);
+
+        std::cout.flush();
+    }
 }

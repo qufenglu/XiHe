@@ -120,6 +120,11 @@ fail:
 
 bool RFC8627FECDecoder::IsHasRecvPacket(uint16_t seq)
 {
+    if (m_pRTPSortArray[seq] == nullptr)
+    {
+        return false;
+    }
+
     if (m_nLastRecvSeq >= MAX_TOLERATED_JUMP)
     {
         if (seq <= m_nLastRecvSeq)
@@ -170,7 +175,7 @@ void RFC8627FECDecoder::OnRTPPacket(const std::shared_ptr<Packet>& packet, bool 
     AddToArray:
         m_pRTPSortArray[seq] = packet;
         m_nLastRecvSeq = seq;
-        Debug("[%p][RFC8627FECDecoder::OnRTPPacket] m_nLastRecvSeq:%d", this, m_nLastRecvSeq);
+        //Debug("[%p][RFC8627FECDecoder::OnRTPPacket] m_nLastRecvSeq:%d", this, m_nLastRecvSeq);
     }
 }
 
@@ -206,17 +211,24 @@ bool RFC8627FECDecoder::SetSSRC(uint32_t ssrc)
 
 void RFC8627FECDecoder::RecvCachePacket(FEC2DTable* pFEC2DTable)
 {
+    bool bHasRecv = false;
     for (auto it = m_pCachePacketList.begin(); it != m_pCachePacketList.cend();)
     {
         if (pFEC2DTable->IsCanRecvPacket(*it))
         {
-            pFEC2DTable->RecvPacketAndTryRepair(*it);
+            pFEC2DTable->RecvPacketAndTryRepair(*it, false);
             it = m_pCachePacketList.erase(it);
+            bHasRecv = true;
         }
         else
         {
             ++it;
         }
+    }
+
+    if (bHasRecv)
+    {
+        pFEC2DTable->TryRepair();
     }
 }
 
@@ -228,11 +240,11 @@ int32_t RFC8627FECDecoder::RecvPacket(const std::shared_ptr<Packet>& packet)
     uint16_t seq = (packet->m_pData[2] << 8) | packet->m_pData[3];
     if (bIsRepair)
     {
-        Debug("[%p]recv repair rtp seq:%d pt:%d", this, seq, pt);
+        //Debug("[%p]recv repair rtp seq:%d pt:%d", this, seq, pt);
     }
     else
     {
-        Debug("[%p]recv rtp seq:%d pt:%d", this, seq, pt);
+        //Debug("[%p]recv rtp seq:%d pt:%d", this, seq, pt);
         OnRTPPacket(packet);
     }
 
@@ -347,7 +359,7 @@ void RFC8627FECDecoder::OutPacketThread()
             if (nackTimer.GetDuration() > NACK_TICK)
             {
                 nackTimer.MakeTimePoint();
-                OutNackPacketIfNeed();
+                //OutNackPacketIfNeed();
             }
         }
 
@@ -421,7 +433,7 @@ std::shared_ptr<Packet> RFC8627FECDecoder::MakeNackPacket()
 {
     std::list<NackItem> nackItems;
     std::shared_ptr<Packet> nack = nullptr;
-
+ 
     {
         //std::lock_guard<std::mutex> lock(m_pRTPSortArrayLock);
         uint16_t seq = m_nLastOutSeq + 1;

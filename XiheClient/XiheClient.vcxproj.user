@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <RemoteTarget>2016653336;192.168.5.53 (username=, port=22, authentication=Password)</RemoteTarget>
-    <RemoteDebuggingTarget>2016653336;192.168.5.53 (username=, port=22, authentication=Password)</RemoteDebuggingTarget>
+    <RemoteTarget>1139240017;192.168.5.6 (username=, port=22, authentication=Password)</RemoteTarget>
+    <RemoteDebuggingTarget>1139240017;192.168.5.6 (username=, port=22, authentication=Password)</RemoteDebuggingTarget>
     <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <RemoteTarget>2016653336;192.168.5.53 (username=, port=22, authentication=Password)</RemoteTarget>
-    <RemoteDebuggingTarget>2016653336;192.168.5.53 (username=, port=22, authentication=Password)</RemoteDebuggingTarget>
+    <RemoteTarget>1139240017;192.168.5.6 (username=, port=22, authentication=Password)</RemoteTarget>
+    <RemoteDebuggingTarget>1139240017;192.168.5.6 (username=, port=22, authentication=Password)</RemoteDebuggingTarget>
     <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">

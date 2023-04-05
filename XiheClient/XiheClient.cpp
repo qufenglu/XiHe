@@ -82,6 +82,7 @@ int32_t XIheClient::PlayFile(const std::string& file)
 
 void XIheClient::OnRecvVideoPacket(std::shared_ptr<MediaPacket>& video)
 {
+    //Debug("[%p][XIheClient::OnRecvVideoPacket] Recv Video Packet time:%llu", this, video->m_lPTS);
     std::lock_guard<std::mutex> lock(m_pVideoDecoderLock);
     if (m_pVideoDecoder != nullptr)
     {
@@ -91,6 +92,7 @@ void XIheClient::OnRecvVideoPacket(std::shared_ptr<MediaPacket>& video)
 
 void XIheClient::OnRecvVideoFrame(std::shared_ptr<VideoFrame>& video)
 {
+   //Debug("[%p][XIheClient::OnRecvVideoPacket] Recv Video Frame time:%llu", this, video->m_lPTS);
     if (m_pVideoFrameCallback != nullptr)
     {
         m_pVideoFrameCallback(video);
@@ -110,7 +112,8 @@ void XIheClient::OnVideoReady(const VideoInfo& info)
         m_pVideoDecoder = nullptr;
         return;
     }
-    m_pVideoDecoder->SetVideoFrameCallBack(m_pVideoFrameCallback);
+
+    m_pVideoDecoder->SetVideoFrameCallBack(std::bind(&XIheClient::OnRecvVideoFrame, this, std::placeholders::_1));
 }
 
 int32_t XIheClient::SetVideoFrameCallback(VideoDecoder::VideoFrameCallbaclk callback)

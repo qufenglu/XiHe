@@ -226,6 +226,7 @@ int32_t ImageTransoprt::StartTransoprt(std::string device, const VideoCapture::V
 
 void ImageTransoprt::OnCaptureVideo(std::shared_ptr<VideoFrame>& pVideo)
 {
+    //Debug("[%p][ImageTransoprt::OnCaptureVideo] Capture Video time:%llu", this, pVideo->m_lPTS);
     std::lock_guard<std::mutex> lock(m_CaptureVideoListLock);
     m_CaptureVideoList.push_back(pVideo);
 
@@ -239,6 +240,7 @@ void ImageTransoprt::OnCaptureVideo(std::shared_ptr<VideoFrame>& pVideo)
 
 void ImageTransoprt::OnRecvDecodedFrame(std::shared_ptr<VideoFrame>& pVideo)
 {
+    //Debug("[%p][ImageTransoprt::OnRecvDecodedFrame] Recv Decoded Video time:%llu", this, pVideo->m_lPTS);
     std::lock_guard<std::mutex> lock(m_DecodedFrameListLock);
     while (m_DecodedFrameList.size() > MAX_CAPTURE_VIDEO_NUM)
     {
@@ -259,6 +261,7 @@ void ImageTransoprt::OnRecvDecodedFrame(std::shared_ptr<VideoFrame>& pVideo)
 
 void ImageTransoprt::OnRecvEncodedPacket(std::shared_ptr<VideoPacket>& pVideo)
 {
+    //Debug("[%p][ImageTransoprt::OnRecvEncodedPacket] Recv Encoded Video time:%llu", this, pVideo->m_lPTS);
     std::lock_guard<std::mutex> lock(m_EncodedPacketListLock);
     m_EncodedPacketList.push_back(pVideo);
 
@@ -424,6 +427,7 @@ void ImageTransoprt::TransoprtThread()
             continue;
         }
 
+        //Debug("[%p][ImageTransoprt::TransoprtThread] Packetizer packet time:%llu", this, pEncodedPacket->m_lPTS);
         m_pRTPPacketizer->RecvPacket(pEncodedPacket);
         pEncodedPacket = nullptr;
     }

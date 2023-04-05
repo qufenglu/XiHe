@@ -38,8 +38,9 @@ public:
     bool SetRTPPacketCallback(RTPPacketCallback callback);
     void ClearTable();
     int32_t RecvPacketAndMakeRepair(const std::shared_ptr<Packet>& packet);
-    int32_t RecvPacketAndTryRepair(const std::shared_ptr<Packet>& packet);
+    int32_t RecvPacketAndTryRepair(const std::shared_ptr<Packet>& packet, bool isRepair = true);
     bool IsCanRecvPacket(const std::shared_ptr<Packet>& packet);
+    int32_t TryRepair();
 
 private:
     int32_t ReleaseAll();

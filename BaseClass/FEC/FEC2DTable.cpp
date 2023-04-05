@@ -402,7 +402,7 @@ void FEC2DTable::OutputRTPPacket(const std::shared_ptr<Packet>& packet)
     }
 }
 
-int32_t FEC2DTable::RecvPacketAndTryRepair(const std::shared_ptr<Packet>& packet)
+int32_t FEC2DTable::RecvPacketAndTryRepair(const std::shared_ptr<Packet>& packet, bool isRepair)
 {
     if (!IsCanRecvPacket(packet))
     {
@@ -471,6 +471,10 @@ int32_t FEC2DTable::RecvPacketAndTryRepair(const std::shared_ptr<Packet>& packet
     }
 
     //PrintfTable();
+    if (!isRepair)
+    {
+        return 0;
+    }
 
     std::shared_ptr<Packet> pFixedPacket = TryRepairByColumn(col);
     if (pFixedPacket != nullptr)
@@ -484,6 +488,31 @@ int32_t FEC2DTable::RecvPacketAndTryRepair(const std::shared_ptr<Packet>& packet
     {
         OutputRTPPacket(pFixedPacket);
         RecvPacketAndTryRepair(pFixedPacket);
+    }
+
+    return 0;
+}
+
+int32_t FEC2DTable::TryRepair()
+{
+    for (int col = 0; col < m_nColumnNum; col++)
+    {
+        std::shared_ptr<Packet> pFixedPacket = TryRepairByColumn(col);
+        if (pFixedPacket != nullptr)
+        {
+            OutputRTPPacket(pFixedPacket);
+            RecvPacketAndTryRepair(pFixedPacket);
+        }
+    }
+
+    for (int row = 0; row < m_nRowNum; row++)
+    {
+        std::shared_ptr<Packet> pFixedPacket = TryRepairByRow(row);
+        if (pFixedPacket != nullptr)
+        {
+            OutputRTPPacket(pFixedPacket);
+            RecvPacketAndTryRepair(pFixedPacket);
+        }
     }
 
     return 0;
@@ -561,7 +590,7 @@ std::shared_ptr<Packet> FEC2DTable::TryRepairByRow(uint32_t row)
 std::shared_ptr<Packet> FEC2DTable::TryRepairByColumn(uint32_t col)
 {
     std::shared_ptr<Packet> packet = nullptr;
-    if (m_pColumnCounter[col] == (m_nColumnNum-1) && m_pColumnRepairPacket[col] != nullptr)
+    if (m_pColumnCounter[col] == (m_nColumnNum - 1) && m_pColumnRepairPacket[col] != nullptr)
     {
         uint32_t nPackNum = 0;
         uint8_t* data[MAX_FEC_LINE] = { 0 };
