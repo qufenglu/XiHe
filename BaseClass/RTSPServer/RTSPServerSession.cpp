@@ -14,6 +14,9 @@
 #define HEART_BEAT_CYCLE (15*1000)
 #define HEART_BEAT_TIMEOUT (60*1000)
 #define MAX_RTP_CACHE_NUM (200)
+#define MAX_PACKET_SIZE 1600
+extern int g_nCaptureWidth;
+extern int g_nCaptureHeight;
 
 RTSPServerSession::RTSPServerSession(uint32_t fd, std::string strRemoteIP)
 {
@@ -29,6 +32,8 @@ RTSPServerSession::RTSPServerSession(uint32_t fd, std::string strRemoteIP)
     m_strResouce = "";
     m_nVideoWidth = 1280;
     m_nVideoHight = 720;
+    m_eVideoType = VIDEO_TYPE_H264;
+    m_nFps = 25;
 
     uint16_t port;
     GetLocalIPAndPort(m_nSessionfd, m_strLocalIP, port);
@@ -48,6 +53,7 @@ RTSPServerSession::RTSPServerSession(uint32_t fd, std::string strRemoteIP)
     m_pSendMediaThread = nullptr;
     m_bSessionFinished = false;
     m_bEnableOSD = false;
+    m_pSendBuff = nullptr;
 }
 
 RTSPServerSession::~RTSPServerSession()
@@ -126,6 +132,8 @@ int32_t RTSPServerSession::ReleaseAll()
     m_eVideoTransport = UDP;
     m_eAudioTransport = UDP;
     m_bEnableOSD = false;
+    free(m_pSendBuff);
+    m_pSendBuff = nullptr;
 
     return 0;
 }
@@ -198,7 +206,7 @@ void RTSPServerSession::SessionThread()
 
         if (m_bNeedWait)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
         }
     }
 
@@ -494,7 +502,9 @@ int32_t RTSPServerSession::OnRecvRtspRequest(const RtspParser::RtspRequest& req)
 
     if (m_strUrl.size() == 0)
     {
-        m_strUrl = req.m_StrUrl;
+        std::vector<std::string> result;
+        split(req.m_StrUrl, result, "?");
+        m_strUrl = result[0];
     }
 
     return 0;
@@ -562,6 +572,83 @@ int32_t RTSPServerSession::SendRtspResponse(const RtspParser::RtspResponse& rsp)
     return 0;
 }
 
+int32_t RTSPServerSession::SetVideoType(const std::string& type)
+{
+    Trace("[%p][RTSPServer::SetVideoType] set video type:%s", this, type.c_str());
+    VideoType eVideoType =
+        type == "mpeg" ? VIDEO_TYPE_MJPG :
+        type == "h264" ? VIDEO_TYPE_H264 :
+        VIDEO_TYPE_H264;
+    m_eVideoType = eVideoType;
+    return 0;
+}
+
+int32_t RTSPServerSession::SetResolution(const std::string& resolution)
+{
+    Trace("[%p][RTSPServer::SetResolution] set resolution:%s", this, resolution.c_str());
+    std::vector<std::string> temp;
+    split(resolution, temp, "*");
+    if (temp.size() != 2)
+    {
+        Error("[%p][RTSPServer::SetResolution] input resolution:%s error", this, resolution.c_str());
+        return -1;
+    }
+
+    int w = atoi(temp[0].c_str());
+    int h = atoi(temp[1].c_str());
+    if (w <= 0 || h <= 0)
+    {
+        Error("[%p][RTSPServer::SetResolution] input resolution:%s error", this, resolution.c_str());
+        return -2;
+    }
+    m_nVideoWidth = w;
+    m_nVideoHight = h;
+
+    return 0;
+}
+
+int32_t RTSPServerSession::SetFps(const std::string& fps)
+{
+    Trace("[%p][RTSPServer::SetFps] set fps:%s", this, fps.c_str());
+    int f = atoi(fps.c_str());
+    if (f <= 0)
+    {
+        Error("[%p][RTSPServer::SetFps] input fps:%s error", this, fps.c_str());
+        return -1;
+    }
+    m_nFps = f;
+
+    return 0;
+}
+
+int32_t RTSPServerSession::ParseExtendedParame(const std::string& strExParam)
+{
+    if (strExParam != "")
+    {
+        std::vector<std::string> param;
+        std::vector<std::string> temp;
+        split(strExParam, param, "&");
+        for (const auto& item : param)
+        {
+            split(item, temp, "=");
+            if (temp.size() == 2)
+            {
+                int ret =
+                    temp[0] == "image" ? SetVideoType(temp[1]) :
+                    temp[0] == "resolution" ? SetResolution(temp[1]) :
+                    temp[0] == "fps" ? SetFps(temp[1]) : -999;
+
+                if (ret != 0)
+                {
+                    Error("[%p][RTSPServer::ParseExtendedParame] parse key:%s value:%s fail,return:%d", this, temp[0].c_str(), temp[1].c_str(), ret);
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
 int32_t RTSPServerSession::HandleDescribeRequest(const RtspParser::RtspRequest& req)
 {
     RtspParser::RtspResponse rsp;
@@ -598,7 +685,17 @@ int32_t RTSPServerSession::HandleDescribeRequest(const RtspParser::RtspRequest& 
             break;
         }
 
+        std::string strExParam = "";
         std::vector<std::string> param;
+        //去除?后面带的参数
+        split(temp[1], param, "?");
+        temp[1] = param[0];
+        if (param.size() == 2)
+        {
+            strExParam = param[1];
+            ParseExtendedParame(strExParam);
+        }
+
         split(temp[1], param, "/");
         if (param.size() != 3)
         {
@@ -652,6 +749,7 @@ int32_t RTSPServerSession::HandleDescribeRequest(const RtspParser::RtspRequest& 
         Error("[%p][RTSPServer::HandleDescribeRequest] SendRtspResponse fail,return:%d", this, result);
         ret = -5;
     }
+
     return ret;
 }
 
@@ -715,14 +813,14 @@ int32_t RTSPServerSession::HandlePlayRequest(const RtspParser::RtspRequest& req)
     VideoCapture::VideoCaptureCapability capability;
     capability.m_nWidth = m_nVideoWidth;
     capability.m_nHeight = m_nVideoHight;
-    capability.m_nFPS = 25;
+    capability.m_nFPS = m_nFps;
     capability.m_bInterlaced = false;
     capability.m_nVideoType = V4L2_PIX_FMT_MJPEG;
 
     delete m_pImageTransoprt;
     bool bIsEnableFec = m_eVideoTransport == UDP ? true : false;
     m_pImageTransoprt = new ImageTransoprt(bIsEnableFec);
-    int ret = m_pImageTransoprt->StartTransoprt(m_strResouce, capability);
+    int ret = m_pImageTransoprt->StartTransoprt(m_strResouce, capability, m_eVideoType);
     if (ret != 0)
     {
         delete m_pImageTransoprt;
@@ -948,17 +1046,12 @@ int32_t RTSPServerSession::MakeDeviceSdp(std::string& sdp, const std::string dev
         return -1;
     }
 
-    m_nVideoWidth = 1280;
-    m_nVideoHight = 720;
-
-    /*Trace("..................................................1");
     std::list<VideoCapture::VideoCaptureCapability*>* capabilitys = VideoCapture::GetDeviceCapabilities(m_strResouce);
     for (auto& capability : *capabilitys)
     {
         delete capability;
     }
     delete capabilitys;
-    Trace("..................................................2");*/
 
     sdp += "v=0\r\n";
     sdp += "o=XiHe ";
@@ -988,7 +1081,12 @@ int32_t RTSPServerSession::MakeDeviceSdp(std::string& sdp, const std::string dev
     sdp += m_strUrl;
     sdp += "trackID=1";
     sdp += "\r\n";
-    sdp += "a=rtpmap:96 H264/90000\r\n";
+    sdp += "a=rtpmap:96 ";
+    std::string type =
+        m_eVideoType == VIDEO_TYPE_H264 ? "H264" :
+        m_eVideoType == VIDEO_TYPE_MJPG ? "MJPG" : "H264";
+    sdp += type;
+    sdp += "/90000\r\n";
     m_nVideoTrackId = 1;
 
     return 0;
@@ -1145,11 +1243,9 @@ void RTSPServerSession::OnRecvVideoPacket(const std::shared_ptr<Packet>& packet)
         std::lock_guard<std::mutex> lock(m_VideoRtpPacketListLock);
         m_VideoRtpPacketList.push_back(packet);
 
-        while (m_VideoRtpPacketList.size() > MAX_RTP_CACHE_NUM)
+        if (m_VideoRtpPacketList.size() > (MAX_RTP_CACHE_NUM))
         {
-            auto pRtpPacket = m_VideoRtpPacketList.front();
-            m_VideoRtpPacketList.pop_front();
-            bHasDiscard = true;
+            m_VideoRtpPacketList.clear();
         }
     }
 
@@ -1161,6 +1257,16 @@ void RTSPServerSession::OnRecvVideoPacket(const std::shared_ptr<Packet>& packet)
 
 void RTSPServerSession::SendMediaThread()
 {
+    if (m_pSendBuff == nullptr)
+    {
+        m_pSendBuff = (uint8_t*)malloc(MAX_PACKET_SIZE);
+        if (m_pSendBuff == nullptr)
+        {
+            Error("[%p][RTSPServer::StartSession] maloc send buff fail", this);
+            return;
+        }
+    }
+
     while (!m_bStopSendMedia)
     {
         bool bHasSendVideo;
@@ -1170,7 +1276,7 @@ void RTSPServerSession::SendMediaThread()
 
         if ((!bHasSendVideo) && (!bHasSendAudio))
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
 }
@@ -1196,16 +1302,40 @@ int32_t RTSPServerSession::SendVideo(bool& bHasSend)
     bHasSend = true;
     int nSendfd = m_nVideoRtpfd;
 
+    int32_t size = 0;
     if (m_eVideoTransport == TCP)
     {
         nSendfd = m_nSessionfd;
-        char temp[4];
-        temp[0] = 0x24; temp[1] = 0x00;
-        temp[2] = packet->m_nLength >> 8;
-        temp[3] = packet->m_nLength & 0xff;
-        send(nSendfd, temp, 4, 0);
+        m_pSendBuff[0] = 0x24;
+        m_pSendBuff[1] = 0x00;
+        m_pSendBuff[2] = packet->m_nLength >> 8;
+        m_pSendBuff[3] = packet->m_nLength & 0xff;
+        size = 4;
     }
-    send(nSendfd, packet->m_pData, packet->m_nLength, 0);
+    memcpy(m_pSendBuff + size, packet->m_pData, packet->m_nLength);
+    size += packet->m_nLength;
+
+    int nSend = 0;
+    int ret = 0;
+    while (nSend < size)
+    {
+    send:        
+        ret = send(nSendfd, m_pSendBuff + nSend, size - nSend, 0);
+        if(ret == -1)
+        {
+            if (errno == EAGAIN)
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                goto send;
+            }
+            Error("[%p][RTSPServerSession::SendVideo] send packet fail,errno:%d", this, errno);
+            break;
+        }
+        else
+        {
+            nSend += ret;
+        }
+    }
 
     return 0;
 
@@ -1232,29 +1362,29 @@ int32_t RTSPServerSession::EnableOSD(bool enable)
         color.A = 255 * 0; color.R = 255; color.G = 255; color.B = 255;
 
         m_pImageTransoprt->AddMarker("pitch");
-        m_pImageTransoprt->SetMarkKey("pitch", "俯仰:", color, 25, m_nVideoHight / 2 - 100);
+        m_pImageTransoprt->SetMarkKey("pitch", "俯仰:", color, 25, g_nCaptureHeight / 2 - 100);
         m_pImageTransoprt->AddMarker("roll");
-        m_pImageTransoprt->SetMarkKey("roll", "横滚:", color, 25, m_nVideoHight / 2);
+        m_pImageTransoprt->SetMarkKey("roll", "横滚:", color, 25, g_nCaptureHeight / 2);
         m_pImageTransoprt->AddMarker("yaw");
-        m_pImageTransoprt->SetMarkKey("yaw", "偏航:", color, 25, m_nVideoHight / 2 + 100);
+        m_pImageTransoprt->SetMarkKey("yaw", "偏航:", color, 25, g_nCaptureHeight / 2 + 100);
 
         m_pImageTransoprt->AddMarker("vol");
-        m_pImageTransoprt->SetMarkKey("vol", "电压:", color, m_nVideoWidth - 160, m_nVideoHight / 2 - 100);
+        m_pImageTransoprt->SetMarkKey("vol", "电压:", color, g_nCaptureWidth - 160, g_nCaptureHeight / 2 - 100);
         m_pImageTransoprt->AddMarker("cur");
-        m_pImageTransoprt->SetMarkKey("cur", "电流:", color, m_nVideoWidth - 160, m_nVideoHight / 2);
+        m_pImageTransoprt->SetMarkKey("cur", "电流:", color, g_nCaptureWidth - 160, g_nCaptureHeight / 2);
         m_pImageTransoprt->AddMarker("rem");
-        m_pImageTransoprt->SetMarkKey("rem", "电量:", color, m_nVideoWidth - 160, m_nVideoHight / 2 + 100);
+        m_pImageTransoprt->SetMarkKey("rem", "电量:", color, g_nCaptureWidth - 160, g_nCaptureHeight / 2 + 100);
 
         m_pImageTransoprt->AddMarker("lat");
-        m_pImageTransoprt->SetMarkKey("lat", "纬度:", color, m_nVideoWidth / 5 * 0 + 25, m_nVideoHight - 45);
+        m_pImageTransoprt->SetMarkKey("lat", "纬度:", color, g_nCaptureWidth / 5 * 0 + 25, g_nCaptureHeight - 45);
         m_pImageTransoprt->AddMarker("lon");
-        m_pImageTransoprt->SetMarkKey("lon", "经度:", color, m_nVideoWidth / 5 * 1 + 25, m_nVideoHight - 45);
+        m_pImageTransoprt->SetMarkKey("lon", "经度:", color, g_nCaptureWidth / 5 * 1 + 25, g_nCaptureHeight - 45);
         m_pImageTransoprt->AddMarker("alt");
-        m_pImageTransoprt->SetMarkKey("alt", "海拔:", color, m_nVideoWidth / 5 * 2 + 25, m_nVideoHight - 45);
+        m_pImageTransoprt->SetMarkKey("alt", "海拔:", color, g_nCaptureWidth / 5 * 2 + 25, g_nCaptureHeight - 45);
         m_pImageTransoprt->AddMarker("sat");
-        m_pImageTransoprt->SetMarkKey("sat", "卫星:", color, m_nVideoWidth / 5 * 3 + 25, m_nVideoHight - 45);
+        m_pImageTransoprt->SetMarkKey("sat", "卫星:", color, g_nCaptureWidth / 5 * 3 + 25, g_nCaptureHeight - 45);
         m_pImageTransoprt->AddMarker("vel");
-        m_pImageTransoprt->SetMarkKey("vel", "速度:", color, m_nVideoWidth / 5 * 4 + 25, m_nVideoHight - 45);
+        m_pImageTransoprt->SetMarkKey("vel", "速度:", color, g_nCaptureWidth / 5 * 4 + 25, g_nCaptureHeight - 45);
     }
     else
     {

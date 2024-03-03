@@ -236,6 +236,7 @@ int32_t DigitalTransport::TransportThread()
 
     while (!m_bStopTransport)
     {
+        bool bHasMsg = false;
         if (m_cHeartbeatTimer.GetDuration() > HEART_BEAT_TICKET)
         {
             m_cHeartbeatTimer.MakeTimePoint();
@@ -263,6 +264,7 @@ int32_t DigitalTransport::TransportThread()
                     std::shared_ptr<Packet> packet = m_pControllerMsgList.front();
                     m_pControllerMsgList.pop_front();
                     m_pDataChannel4Controller->SendMsg(packet);
+                    bHasMsg = true;
                 }
             }
         }
@@ -277,11 +279,15 @@ int32_t DigitalTransport::TransportThread()
                     std::shared_ptr<Packet> packet = m_pRemoteMsgList.front();
                     m_pRemoteMsgList.pop_front();
                     m_pDataChannel4Remote->SendMsg(packet);
+                    bHasMsg = true;
                 }
             }
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        if (!bHasMsg)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        }
     }
 
     return 0;

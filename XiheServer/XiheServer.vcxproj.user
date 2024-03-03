@@ -3,22 +3,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
     <RemoteDebugTarget>692445743;169.254.194.24 (username=, port=22, authentication=Password)</RemoteDebugTarget>
-    <RemoteTarget>837319749;192.168.5.4 (username=, port=22, authentication=Password)</RemoteTarget>
-    <RemoteDebuggingTarget>837319749;192.168.5.4 (username=, port=22, authentication=Password)</RemoteDebuggingTarget>
+    <RemoteTarget>1954732345;192.168.0.5 (username=, port=22, authentication=Password)</RemoteTarget>
+    <RemoteDebuggingTarget>1954732345;192.168.0.5 (username=, port=22, authentication=Password)</RemoteDebuggingTarget>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <RemoteTarget>1398746614;192.168.5.8 (username=, port=22, authentication=Password)</RemoteTarget>
-    <RemoteDebuggingTarget>1398746614;192.168.5.8 (username=, port=22, authentication=Password)</RemoteDebuggingTarget>
+    <RemoteTarget>1954732345;192.168.0.5 (username=, port=22, authentication=Password)</RemoteTarget>
+    <RemoteDebuggingTarget>1954732345;192.168.0.5 (username=, port=22, authentication=Password)</RemoteDebuggingTarget>
     <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <RemoteTarget>1398746614;192.168.5.8 (username=, port=22, authentication=Password)</RemoteTarget>
-    <RemoteDebuggingTarget>1398746614;192.168.5.8 (username=, port=22, authentication=Password)</RemoteDebuggingTarget>
+    <RemoteTarget>1954732345;192.168.0.5 (username=, port=22, authentication=Password)</RemoteTarget>
+    <RemoteDebuggingTarget>1954732345;192.168.0.5 (username=, port=22, authentication=Password)</RemoteDebuggingTarget>
     <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <RemoteTarget>837319749;192.168.5.4 (username=, port=22, authentication=Password)</RemoteTarget>
-    <RemoteDebuggingTarget>837319749;192.168.5.4 (username=, port=22, authentication=Password)</RemoteDebuggingTarget>
+    <RemoteTarget>1954732345;192.168.0.5 (username=, port=22, authentication=Password)</RemoteTarget>
+    <RemoteDebuggingTarget>1954732345;192.168.0.5 (username=, port=22, authentication=Password)</RemoteDebuggingTarget>
     <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

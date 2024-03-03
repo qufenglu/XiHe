@@ -80,7 +80,8 @@ int32_t VideoDecoder::AddVideoStream(const VideoInfo& info)
             Warn("[%p][VideoDecoder::AddVideoStream] The decoder has already added stream,old decoder will be destroyed", this);
         }
 
-        m_pAVCodec = info.m_nCodecID == AV_CODEC_ID_H264 ? avcodec_find_decoder_by_name("h264_v4l2m2m") :
+        m_pAVCodec =
+            info.m_nCodecID == AV_CODEC_ID_H264 ? avcodec_find_decoder_by_name("h264_v4l2m2m") :
             info.m_nCodecID == AV_CODEC_ID_H265 ? avcodec_find_decoder_by_name("h265_v4l2m2m") : nullptr;
         if (m_pAVCodec == nullptr)
         {

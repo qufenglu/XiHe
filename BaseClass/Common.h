@@ -118,3 +118,28 @@ typedef struct Packet
         free(m_pData);
     }
 }Packet;
+
+typedef struct Resolution
+{
+    int32_t m_nWidth;
+    int32_t m_nHeight;
+
+    Resolution()
+    {
+        m_nWidth = 0;
+        m_nHeight = 0;
+    }
+}Resolution;
+
+typedef  enum TransportType
+{
+    TCP = 1,
+    UDP
+}TransportType;
+
+typedef  enum VideoType
+{
+    VIDEO_TYPE_NONE,
+    VIDEO_TYPE_H264 = 1,
+    VIDEO_TYPE_MJPG
+}VideoType;

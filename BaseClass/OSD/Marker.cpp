@@ -56,7 +56,7 @@ int32_t Marker::Init()
         goto fail;
     }
     //err = FT_Set_Pixel_Sizes(m_pFTFace,16, 16);
-    err = FT_Set_Char_Size(m_pFTFace, 14 * 64, 14 * 64, 96, 96);
+    err = FT_Set_Char_Size(m_pFTFace, 16 * 64, 16 * 64, 96, 96);
     if (err != FT_Err_Ok)
     {
         Error("[%p][Marker::Init] FT_Set_Char_Size fail,return:%d", this, err);

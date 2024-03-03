@@ -55,6 +55,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <RemoteCompileLocalCopyObjectFiles>true</RemoteCompileLocalCopyObjectFiles>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <MultiProcNumber>4</MultiProcNumber>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <MultiProcNumber>4</MultiProcNumber>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
       <LibraryDependencies>wiringPi;pthread;avcodec;avformat;swscale;avutil</LibraryDependencies>
@@ -111,7 +117,9 @@
     <ClCompile Include="..\BaseClass\OSD\Marker.cpp" />
     <ClCompile Include="..\BaseClass\OSD\OSD.cpp" />
     <ClCompile Include="..\BaseClass\RTPPacketizer\H264RTPpacketizer.cpp" />
+    <ClCompile Include="..\BaseClass\RTPPacketizer\MJPEGRTPpacketizer.cpp" />
     <ClCompile Include="..\BaseClass\RTPParser\H264RTPParser.cpp" />
+    <ClCompile Include="..\BaseClass\RTPParser\MJPEGRTPParser.cpp" />
     <ClCompile Include="..\BaseClass\RTSPServer\RTSPServer.cpp" />
     <ClCompile Include="..\BaseClass\RTSPServer\RTSPServerSession.cpp" />
     <ClCompile Include="main.cpp" />
@@ -762,8 +770,10 @@
     <ClInclude Include="..\BaseClass\OSD\Marker.h" />
     <ClInclude Include="..\BaseClass\OSD\OSD.h" />
     <ClInclude Include="..\BaseClass\RTPPacketizer\H264RTPpacketizer.h" />
+    <ClInclude Include="..\BaseClass\RTPPacketizer\MJPEGRTPpacketizer.h" />
     <ClInclude Include="..\BaseClass\RTPPacketizer\RTPPacketizer.h" />
     <ClInclude Include="..\BaseClass\RTPParser\H264RTPParser.h" />
+    <ClInclude Include="..\BaseClass\RTPParser\MJPEGRTPParser.h" />
     <ClInclude Include="..\BaseClass\RTPParser\RTPParser.h" />
     <ClInclude Include="..\BaseClass\RTSPServer\RTSPServer.h" />
     <ClInclude Include="..\BaseClass\RTSPServer\RTSPServerSession.h" />
@@ -787,6 +797,7 @@
     <ClCompile>
       <AdditionalOptions>-Wall %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>../BaseClass/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <UnrollLoops>false</UnrollLoops>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

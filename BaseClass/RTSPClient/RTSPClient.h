@@ -18,15 +18,22 @@ class RTSPClient
 {
 public:
     typedef std::function<void(const VideoInfo&)> VideoReadyCallbaclk;
+    typedef  enum TransportType
+    {
+        TCP = 1,
+        UDP
+    }TransportType;
 
 public:
     RTSPClient();
     ~RTSPClient();
-    int32_t PlayUrl(const std::string& ulr);
+    int32_t PlayUrl(const std::string& ulr, TransportType t = UDP);
     int32_t CloseClient();
     int32_t SetVideoPacketCallbaclk(RTPParser::MediaPacketCallbaclk callback);
     int32_t SetVideoReadyCallbaclk(VideoReadyCallbaclk callback);
     int32_t SetAudioPacketCallbaclk(RTPParser::MediaPacketCallbaclk callback);
+    inline AVCodecID GetVideoFormat() { return m_eVideoFormat; };
+    inline AVCodecID GetAudioFormat() { return m_eAudioFormat; };
 
 private:
     int32_t ReleaseAll();
@@ -79,13 +86,6 @@ private:
     void OnRecvNackPacket(const std::shared_ptr<Packet>& packet);
 
 private:
-    typedef  enum TransportType
-    {
-        TCP = 1,
-        UDP
-    }TransportType;
-
-private:
     int32_t m_nClientSocketfd;
     std::string m_strClientIP;
     uint16_t m_nClientPort;
@@ -95,6 +95,7 @@ private:
     std::thread* m_pClientThread;
     bool m_bIsPlaying;
     std::string m_strPlayUrl;
+    std::string m_strPlayUrlNoExParam;
     uint32_t m_nSeq;
     std::string m_strSessionId;
     bool m_bIsRecord;

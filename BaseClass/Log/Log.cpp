@@ -13,6 +13,7 @@ std::mutex g_cLogLock;
 
 int32_t InitLog(std::string path)
 {
+    std::lock_guard<std::mutex> lock(g_cLogLock);
     if (g_pLogFile != nullptr)
     {
         return -1;
@@ -29,6 +30,7 @@ int32_t InitLog(std::string path)
 
 int32_t UnInitLog()
 {
+    std::lock_guard<std::mutex> lock(g_cLogLock);
     if (g_pLogFile == nullptr)
     {
         return 0;
@@ -57,7 +59,7 @@ int32_t GetTimeStr(char* buff, size_t size)
     time_t tt = std::chrono::system_clock::to_time_t(now);
     auto time_tm = localtime(&tt);
 
-    snprintf(buff,size,"%d-%02d-%02d %02d:%02d:%02d.%03d", time_tm->tm_year + 1900,
+    snprintf(buff, size, "%d-%02d-%02d %02d:%02d:%02d.%03d", time_tm->tm_year + 1900,
         time_tm->tm_mon + 1, time_tm->tm_mday, time_tm->tm_hour,
         time_tm->tm_min, time_tm->tm_sec, (int)disMillseconds);
 
@@ -90,7 +92,7 @@ void Error(const char* format, ...)
         printf("\n");
         va_end(list);
 
-        std::cout.flush();
+        std::cout << std::endl;
     }
 }
 
@@ -114,7 +116,7 @@ void Warn(const char* format, ...)
         printf("\n");
         va_end(list);
 
-        std::cout.flush();
+        std::cout << std::endl;
     }
 }
 
@@ -138,7 +140,7 @@ void Trace(const char* format, ...)
         printf("\n");
         va_end(list);
 
-        std::cout.flush();
+        std::cout << std::endl;
     }
 }
 
@@ -162,7 +164,7 @@ void Debug(const char* format, ...)
         printf("\n");
         va_end(list);
 
-        std::cout.flush();
+        std::cout << std::endl;
     }
 }
 
@@ -186,6 +188,6 @@ void Panic(const char* format, ...)
         printf("\n");
         va_end(list);
 
-        std::cout.flush();
+        std::cout << std::endl;
     }
 }

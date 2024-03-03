@@ -91,7 +91,9 @@
     <ClCompile Include="..\BaseClass\OSD\Marker.cpp" />
     <ClCompile Include="..\BaseClass\OSD\OSD.cpp" />
     <ClCompile Include="..\BaseClass\RTPPacketizer\H264RTPpacketizer.cpp" />
+    <ClCompile Include="..\BaseClass\RTPPacketizer\MJPEGRTPpacketizer.cpp" />
     <ClCompile Include="..\BaseClass\RTPParser\H264RTPParser.cpp" />
+    <ClCompile Include="..\BaseClass\RTPParser\MJPEGRTPParser.cpp" />
     <ClCompile Include="..\BaseClass\RTSPClient\RTSPClient.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="XiheClient.cpp" />
@@ -743,8 +745,10 @@
     <ClInclude Include="..\BaseClass\OSD\Marker.h" />
     <ClInclude Include="..\BaseClass\OSD\OSD.h" />
     <ClInclude Include="..\BaseClass\RTPPacketizer\H264RTPpacketizer.h" />
+    <ClInclude Include="..\BaseClass\RTPPacketizer\MJPEGRTPpacketizer.h" />
     <ClInclude Include="..\BaseClass\RTPPacketizer\RTPPacketizer.h" />
     <ClInclude Include="..\BaseClass\RTPParser\H264RTPParser.h" />
+    <ClInclude Include="..\BaseClass\RTPParser\MJPEGRTPParser.h" />
     <ClInclude Include="..\BaseClass\RTPParser\RTPParser.h" />
     <ClInclude Include="..\BaseClass\RTSPClient\RTSPClient.h" />
     <ClInclude Include="XiheClient.h" />

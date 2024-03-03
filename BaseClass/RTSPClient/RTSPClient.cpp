@@ -9,6 +9,7 @@
 #include "CommonTools/RtspParser.h"
 #include "CommonTools/SdpParser.h"
 #include "RTPParser/H264RTPParser.h"
+#include "RTPParser/MJPEGRTPParser.h"
 
 #define RECV_BUFF_SIZE (1024*4)
 #define HEART_BEAT_CYCLE (15*1000)
@@ -24,6 +25,7 @@ RTSPClient::RTSPClient()
     m_pClientThread = nullptr;
     m_bIsPlaying = false;
     m_strPlayUrl = "";
+    m_strPlayUrlNoExParam = "";
     m_nSeq = 0;
     m_bIsRecord = false;
     m_bEnableFec = false;
@@ -118,6 +120,7 @@ int32_t RTSPClient::ReleaseAll()
     m_eAudioTransport = TransportType::UDP;
 
     m_strPlayUrl = "";
+    m_strPlayUrlNoExParam = "";
     m_ClientBuff.ClearBuff(0);
     {
         std::lock_guard<std::mutex> lock(m_SignalObjectMapLock);
@@ -145,9 +148,9 @@ int32_t RTSPClient::CloseClient()
     return ReleaseAll();
 }
 
-int32_t RTSPClient::PlayUrl(const std::string& url)
+int32_t RTSPClient::PlayUrl(const std::string& url, TransportType t)
 {
-    Trace("[%p][RTSPClient::PlayUrl] play url:%s", this, url.c_str());
+    Trace("[%p][RTSPClient::PlayUrl] play url:%s TransportType:%d", this, url.c_str(), t);
     CloseClient();
 
     std::string ip;
@@ -159,6 +162,9 @@ int32_t RTSPClient::PlayUrl(const std::string& url)
     int flags = 0;
     int len = 0;
     struct timeval timeout;
+    std::vector<std::string> temp;
+    m_eAudioTransport = t;
+    m_eVideoTransport = t;
 
     if (!AnalyzeUrl(url, ip, port))
     {
@@ -200,6 +206,9 @@ int32_t RTSPClient::PlayUrl(const std::string& url)
     }
 
     m_strPlayUrl = url;
+    split(m_strPlayUrl, temp, "?");
+    m_strPlayUrlNoExParam = temp[0];
+
     GetLocalIPAndPort(m_nClientSocketfd, m_strClientIP, m_nClientPort);
     GetRemoteIPAndPort(m_nClientSocketfd, m_strServerIP, m_nServerPort);
 
@@ -336,7 +345,7 @@ void RTSPClient::ClientThread()
 
         if (m_bNeedWait)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
         }
     }
 
@@ -860,7 +869,7 @@ int32_t RTSPClient::SendRtspRequest(RtspParser::RtspRequest& req)
     }
     if (req.m_StrUrl.size() == 0)
     {
-        req.m_StrUrl = m_strPlayUrl;
+        req.m_StrUrl = m_strPlayUrlNoExParam;
     }
     if (req.m_StrVersion.size() == 0)
     {
@@ -934,6 +943,7 @@ int32_t RTSPClient::Describe()
     RtspParser::RtspRequest req;
     req.m_RtspMethod = RtspParser::RTSP_METHOD_DESCRIBE;
     req.m_FieldsMap["Accept"] = "application/sdp";
+    req.m_StrUrl = m_strPlayUrl;
     int32_t ret = SendRtspRequest(req);
     if (ret != 0)
     {
@@ -994,8 +1004,10 @@ int32_t RTSPClient::Describe()
         {
             Trace("[%p][RTSPClient::Describe] video media:%s", this, media.c_str());
             m_nVideoPT = description.nPayloadType;
-            m_eVideoFormat = description.strMediaFormat == "H264" ? AV_CODEC_ID_H264 :
-                description.strMediaFormat == "H265" ? AV_CODEC_ID_H265 : AV_CODEC_ID_NONE;
+            m_eVideoFormat =
+                description.strMediaFormat == "H264" ? AV_CODEC_ID_H264 :
+                description.strMediaFormat == "H265" ? AV_CODEC_ID_H265 :
+                description.strMediaFormat == "MJPG" ? AV_CODEC_ID_MJPEG : AV_CODEC_ID_NONE;
             if (m_eVideoFormat == AV_CODEC_ID_NONE)
             {
                 Error("[%p][RTSPClient::Describe] not support video:%s", this, description.strMediaFormat.c_str());
@@ -1019,7 +1031,7 @@ int32_t RTSPClient::Describe()
             m_nAudioPT = description.nPayloadType;
             m_eAudioFormat = description.strMediaFormat == "PCMA" ? AV_CODEC_ID_PCM_ALAW :
                 description.strMediaFormat == "PCMU" ? AV_CODEC_ID_PCM_MULAW : AV_CODEC_ID_NONE;
-            if (m_eVideoFormat == AV_CODEC_ID_NONE)
+            if (m_eAudioFormat == AV_CODEC_ID_NONE)
             {
                 Error("[%p][RTSPClient::Describe] not support audio:%s", this, description.strMediaFormat.c_str());
                 return -7;
@@ -1136,7 +1148,7 @@ int32_t RTSPClient::Setup(int32_t trackid)
 
     RtspParser::RtspRequest req;
     req.m_RtspMethod = RtspParser::RTSP_METHOD_SETUP;
-    req.m_StrUrl = m_strPlayUrl + "/trackID=" + std::to_string(trackid);
+    req.m_StrUrl = m_strPlayUrlNoExParam + "/trackID=" + std::to_string(trackid);
     if (trackid == m_nVideoTrackID && m_eVideoTransport == TransportType::TCP)
     {
         int32_t id = (trackid - 1) << 1;
@@ -1218,7 +1230,9 @@ int32_t RTSPClient::Setup(int32_t trackid)
         {
             delete m_pVideoParser;
         }
-        m_pVideoParser = m_eVideoFormat == AV_CODEC_ID_H264 ? new H264RTPParser() : nullptr;
+        m_pVideoParser =
+            m_eVideoFormat == AV_CODEC_ID_H264 ? (RTPParser*)new H264RTPParser() :
+            m_eVideoFormat == AV_CODEC_ID_MJPEG ? (RTPParser*)new MJPEGRTPParser() : nullptr;
         m_pVideoParser->SetPacketCallbaclk(m_pVideoPacketCallbaclk);
 
         delete m_pFECDecoder;
@@ -1476,7 +1490,6 @@ void RTSPClient::OnRecvNackPacket(const std::shared_ptr<Packet>& packet)
 {
 
 }
-
 
 int32_t RTSPClient::OnRecvAudio(uint8_t* const  msg, const uint32_t size)
 {

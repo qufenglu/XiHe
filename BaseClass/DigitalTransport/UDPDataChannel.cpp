@@ -250,7 +250,7 @@ int32_t UDPDataChannel::MsgThread()
                             return -1;
                         }
                         m_bIsConnect = false;
-                        Trace("[%p][UDPDataChannel::MsgThread] disconnect  to remote", this);
+                        Trace("[%p][UDPDataChannel::MsgThread] disconnect to remote", this);
                     }
                 }
             }
@@ -269,7 +269,7 @@ int32_t UDPDataChannel::MsgThread()
                     else
                     {
                         m_bIsConnect = true;
-                        Trace("[%p][UDPDataChannel::MsgThread] connect  to remote", this);
+                        Trace("[%p][UDPDataChannel::MsgThread] connect to remote", this);
                     }
                 }
             }
@@ -306,7 +306,7 @@ int32_t UDPDataChannel::MsgThread()
 
         if (!isBusy)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
         }
     }
 

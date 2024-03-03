@@ -15,6 +15,7 @@ public:
     int32_t StopSession();
     inline bool IsSessionFinished() { return m_bSessionFinished; };
     int32_t EnableOSD(bool enable);
+    //Êý´«OSD
     int32_t SetAttitude(float pitch, float roll, float yaw);
     int32_t SetGPS(int32_t lat, int32_t lon, int32_t alt, uint8_t satellites, uint16_t vel);
     int32_t SetSysStatus(uint16_t voltage, int16_t current, int8_t batteryRemaining);
@@ -65,12 +66,10 @@ private:
     int32_t SendVideo(bool& bHasSend);
     int32_t SendAudio(bool& bHasSend);
 
-private:
-    typedef  enum TransportType
-    {
-        TCP = 1,
-        UDP
-    }TransportType;
+    int32_t ParseExtendedParame(const std::string& param);
+    int32_t SetVideoType(const std::string& type);
+    int32_t SetResolution(const std::string& resolution);
+    int32_t SetFps(const std::string& fps);
 
 private:
     int32_t m_nSessionfd;
@@ -78,9 +77,7 @@ private:
     std::string m_strSessionId;
     uint32_t m_nSeq;
     std::string m_strUrl;
-
     TimeCounter m_HeartBeatimeoutTimer;
-
     bool m_bStopSession;
     std::thread* m_pSessionThread;
 
@@ -88,6 +85,8 @@ private:
     std::string m_strResouce;
     uint32_t m_nVideoWidth;
     uint32_t m_nVideoHight;
+    VideoType m_eVideoType;
+    int32_t m_nFps;
 
     std::string m_strLocalIP;
     std::string m_strRemoteIP;
@@ -109,6 +108,7 @@ private:
     bool m_bStopSendMedia;
     std::thread* m_pSendMediaThread;
     bool m_bSessionFinished;
+    uint8_t* m_pSendBuff;
 };
 
 static int32_t ConnectUdpSocket(const std::string& ip, uint16_t port);

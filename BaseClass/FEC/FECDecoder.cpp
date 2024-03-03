@@ -5,7 +5,7 @@
 #define MAX_CACHE_NUM 50
 #define MAX_WAIT_TIME 40.0				//丢包最长等待时间
 #define MAX_SKIP_NUM 100					//丢包最大连续跳跃包数
-#define NACK_TICK 5.0							//发送NACK周期
+#define NACK_TICK 10.0							//发送NACK周期
 #define MAX_TOLERATED_JUMP 100		//最大容忍包跳跃数
 
 
@@ -309,7 +309,7 @@ void RFC8627FECDecoder::OutPacketThread()
             break;
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     TimeCounter lostWaitTimer;
@@ -365,7 +365,7 @@ void RFC8627FECDecoder::OutPacketThread()
 
         if (bNeedWait)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
         }
     }
 }

@@ -93,11 +93,11 @@ void FEC2DTable::ClearTable()
         }
     }
 
-    for (int i = 0; i < m_pRowCounter.size(); i++)
+    for (size_t i = 0; i < m_pRowCounter.size(); i++)
     {
         m_pRowCounter[i] = 0;
     }
-    for (int i = 0; i < m_pColumnCounter.size(); i++)
+    for (size_t i = 0; i < m_pColumnCounter.size(); i++)
     {
         m_pColumnCounter[i] = 0;
     }
@@ -650,8 +650,8 @@ std::shared_ptr<Packet> FEC2DTable::Repair(uint8_t** data, uint16_t* size, uint3
     memset(pPacketData, 0, nPacketSize);
 
     uint8_t nP_X_CC_Byte = 0;		//ÐÞ¸´P¡¢X¡¢CC
-    uint8_t nM_PT_Byte;				//ÐÞ¸´M¡¢PT
-    uint8_t nTSBytes[4];					//ÐÞ¸´TS
+    uint8_t nM_PT_Byte = 0;				//ÐÞ¸´M¡¢PT
+    uint8_t nTSBytes[4] = { 0 };					//ÐÞ¸´TS
     for (uint32_t i = 0; i < nPackNum; i++)
     {
         nP_X_CC_Byte ^= data[i][0];

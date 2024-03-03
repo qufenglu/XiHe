@@ -80,6 +80,12 @@
     <ClCompile Include="..\BaseClass\DigitalTransport\UDPDataChannel.cpp">
       <Filter>BaseClass\DigitalTransport</Filter>
     </ClCompile>
+    <ClCompile Include="..\BaseClass\RTPParser\MJPEGRTPParser.cpp">
+      <Filter>BaseClass\RTPParser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\BaseClass\RTPPacketizer\MJPEGRTPpacketizer.cpp">
+      <Filter>BaseClass\RTPPacketizer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -2120,6 +2126,12 @@
     </ClInclude>
     <ClInclude Include="..\BaseClass\DigitalTransport\mavlink\uAvionix\version.h">
       <Filter>BaseClass\DigitalTransport\mavlink\uAvionix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\BaseClass\RTPParser\MJPEGRTPParser.h">
+      <Filter>BaseClass\RTPParser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\BaseClass\RTPPacketizer\MJPEGRTPpacketizer.h">
+      <Filter>BaseClass\RTPPacketizer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

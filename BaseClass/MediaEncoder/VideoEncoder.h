@@ -5,6 +5,8 @@ extern "C" {
 #include "libavformat/avformat.h"
 #include "libavutil/imgutils.h"
 #include "libavcodec/avcodec.h"
+#include "libavformat/avio.h"
+#include "libswscale/swscale.h"
 }
 
 
@@ -27,6 +29,7 @@ public:
         uint32_t m_nWidth = 0;
         uint32_t m_nHeight = 0;
         uint32_t m_nBitRate = 0;
+        uint32_t m_nCodecID = AV_CODEC_ID_H264;
     }EncodParam;
     typedef std::function<void(std::shared_ptr<VideoPacket>& pVideo)> VideoPacketCallbaclk;
 
@@ -43,6 +46,7 @@ public:
 private:
     int32_t ReleaseAll();
     int32_t OutputVideoPacket();
+    int32_t ResampleIfNeed(std::shared_ptr<VideoFrame>& pVideoPacket);
 
 private:
     std::mutex m_EncoderLock;
@@ -52,6 +56,11 @@ private:
     AVCodecContext* m_pAVContext;
     AVFrame* m_pFrame;
     AVPacket* m_pPacket;
+
+    int m_nResampleSrcWidth;
+    int m_nResampleSrcHight;
+    SwsContext* m_pResampleContext;
+    AVFrame* m_pResampleFrame;
 
     VideoPacketCallbaclk m_pVideoPacketCallback;
 };

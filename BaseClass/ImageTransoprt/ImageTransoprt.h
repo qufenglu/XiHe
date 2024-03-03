@@ -17,7 +17,7 @@ public:
     ImageTransoprt(bool enableFec);
     ~ImageTransoprt();
 
-    int32_t StartTransoprt(std::string device, const VideoCapture::VideoCaptureCapability& capability);
+    int32_t StartTransoprt(std::string device, const VideoCapture::VideoCaptureCapability& capability, VideoType type);
     int32_t StopTransoprt(std::string device);
     bool SetRtpPacketCallbaclk(ImageTransoprt::RtpPacketCallbaclk callback);
     inline bool IsEnableOSD() { return m_bEnableOSD; };
@@ -43,6 +43,9 @@ private:
     void OnRecvRtpPacket(uint8_t* pRtpPacket, uint32_t size);
     void OnRecvFECEncoderPacket(const std::shared_ptr<Packet>& packet);
 
+    int32_t StartTransoprtH264(std::string device, const VideoCapture::VideoCaptureCapability& capability);
+    int32_t StartTransoprtMJPEG(std::string device, const VideoCapture::VideoCaptureCapability& capability);
+
 private:
     OSD m_cOSD;
     bool m_bEnableOSD;
@@ -52,6 +55,7 @@ private:
     VideoDecoder* m_pVideoDecoder;
     RTPPacketizer* m_pRTPPacketizer;
     RFC8627FECEncoder* m_pFECEncoder;
+    VideoType m_eVideoType;
 
     bool m_bStopTransoprt;
     std::thread* m_pDecodeThread;

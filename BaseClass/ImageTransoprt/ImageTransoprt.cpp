@@ -2,8 +2,11 @@
 #include "ImageTransoprt.h"
 #include "Log/Log.h"
 #include "RTPPacketizer/H264RTPpacketizer.h"
+#include "RTPPacketizer/MJPEGRTPpacketizer.h"
 
 #define MAX_CAPTURE_VIDEO_NUM (1)
+int g_nCaptureWidth = 1280;
+int g_nCaptureHeight = 720;
 
 ImageTransoprt::ImageTransoprt(bool enableFec)
 {
@@ -21,6 +24,7 @@ ImageTransoprt::ImageTransoprt(bool enableFec)
     m_pEncoderThread = nullptr;
 
     m_pRtpPacketCallbaclk = nullptr;
+    m_eVideoType = VIDEO_TYPE_NONE;
 }
 
 ImageTransoprt::~ImageTransoprt()
@@ -101,11 +105,42 @@ int32_t ImageTransoprt::ReleaseAll()
 
     m_pRtpPacketCallbaclk = nullptr;
     m_bEnableOSD = false;
+    m_eVideoType = VIDEO_TYPE_NONE;
 
     return 0;
 }
 
-int32_t ImageTransoprt::StartTransoprt(std::string device, const VideoCapture::VideoCaptureCapability& capability)
+int32_t ImageTransoprt::StartTransoprt(std::string device, const VideoCapture::VideoCaptureCapability& capability, VideoType type)
+{
+    int32_t ret = 0;
+    switch (type)
+    {
+    case VIDEO_TYPE_H264:
+        ret = StartTransoprtH264(device, capability);
+        if (ret != 0)
+        {
+            Error("[%p][ImageTransoprt::StartTransoprt] StartTransoprtH264 fail,return:%d", this, ret);
+            return -1;
+        }
+        break;
+    case VIDEO_TYPE_MJPG:
+        ret = StartTransoprtMJPEG(device, capability);
+        if (ret != 0)
+        {
+            Error("[%p][ImageTransoprt::StartTransoprt] StartTransoprtMJPEG fail,return:%d", this, ret);
+            return -2;
+        }
+        break;
+    default:
+        Error("[%p][ImageTransoprt::StartTransoprt] not support type:%d", this, type);
+        return -3;
+        break;
+    }
+
+    return 0;
+}
+
+int32_t ImageTransoprt::StartTransoprtH264(std::string device, const VideoCapture::VideoCaptureCapability& capability)
 {
     Trace("[%p][ImageTransoprt::StartTransoprt] StartTransoprt", this);
 
@@ -146,11 +181,11 @@ int32_t ImageTransoprt::StartTransoprt(std::string device, const VideoCapture::V
     VideoEncoder::VideoPacketCallbaclk pVideoPacketCallbaclk = std::bind(&ImageTransoprt::OnRecvEncodedPacket, this, std::placeholders::_1);
     m_pVideoEncoder->SetVideoPacketCallback(pVideoPacketCallbaclk);
 
-
     VideoEncoder::EncodParam encodParam;
     encodParam.m_nBitRate = 6 * 1024 * 1024;
     encodParam.m_nHeight = capability.m_nHeight;
     encodParam.m_nWidth = capability.m_nWidth;
+    encodParam.m_nCodecID = AV_CODEC_ID_H264;
 
     int32_t ret = m_pVideoEncoder->OpenEncoder(encodParam);
     if (ret < 0)
@@ -220,6 +255,113 @@ int32_t ImageTransoprt::StartTransoprt(std::string device, const VideoCapture::V
     m_pTransoprtThread = new std::thread(&ImageTransoprt::TransoprtThread, this);
     m_pEncoderThread = new std::thread(&ImageTransoprt::EncoderThread, this);
     m_pDecodeThread = new std::thread(&ImageTransoprt::DecodeThread, this);
+    m_eVideoType = VIDEO_TYPE_H264;
+
+    return 0;
+}
+
+int32_t ImageTransoprt::StartTransoprtMJPEG(std::string device, const VideoCapture::VideoCaptureCapability& capability)
+{
+    Trace("[%p][ImageTransoprt::StartTransoprtMJPEG] StartTransoprtMJPEG", this);
+    VideoCapture::VideoCaptureCapability cap = capability;
+
+    if (m_pTransoprtThread != nullptr)
+    {
+        Error("[%p][ImageTransoprt::StartTransoprtMJPEG] Transmission is already in progress, please stop the previous transmission first", this);
+        return -1;
+    }
+
+    ReleaseAll();
+
+    m_pVideoCapture = new VideoCapture();
+    VideoCapture::CaptureVideoCallbaclk pCaptureVideoCallbaclk = std::bind(&ImageTransoprt::OnCaptureVideo, this, std::placeholders::_1);
+    m_pVideoCapture->SetCaptureVideoCallbaclk(pCaptureVideoCallbaclk);
+
+    if (capability.m_nVideoType != V4L2_PIX_FMT_YUV420)
+    {
+        m_pVideoDecoder = new VideoDecoder();
+
+        VideoInfo info;
+        info.m_nCodecID = AV_CODEC_ID_MJPEG;
+        info.m_nWidth = g_nCaptureWidth;
+        info.m_nHight = g_nCaptureHeight;
+
+        int32_t ret = m_pVideoDecoder->AddVideoStream(info);
+        if (ret < 0)
+        {
+            Error("[%p][ImageTransoprt::StartTransoprt] AddVideoStream fail,return:%d", this, ret);
+            ReleaseAll();
+            return -2;
+        }
+
+        VideoDecoder::VideoFrameCallbaclk pVideoDecoderFrameCallbaclk = std::bind(&ImageTransoprt::OnRecvDecodedFrame, this, std::placeholders::_1);
+        m_pVideoDecoder->SetVideoFrameCallBack(pVideoDecoderFrameCallbaclk);
+    }
+
+    m_pVideoEncoder = new VideoEncoder();
+    VideoEncoder::VideoPacketCallbaclk pVideoPacketCallbaclk = std::bind(&ImageTransoprt::OnRecvEncodedPacket, this, std::placeholders::_1);
+    m_pVideoEncoder->SetVideoPacketCallback(pVideoPacketCallbaclk);
+
+
+    VideoEncoder::EncodParam encodParam;
+    encodParam.m_nBitRate = 1 * 1024 * 1024;
+    encodParam.m_nHeight = capability.m_nHeight;
+    encodParam.m_nWidth = capability.m_nWidth;
+    encodParam.m_nCodecID = AV_CODEC_ID_MJPEG;
+    int32_t ret = m_pVideoEncoder->OpenEncoder(encodParam);
+    if (ret < 0)
+    {
+        Error("[%p][ImageTransoprt::StartTransoprt] OpenEncoder fail,return:%d", this, ret);
+        ReleaseAll();
+        return -3;
+    }
+
+    m_pRTPPacketizer = new MJPEGRTPpacketizer();
+    ret = ((MJPEGRTPpacketizer*)m_pRTPPacketizer)->Init();
+    if (ret < 0)
+    {
+        Error("[%p][ImageTransoprt::StartTransoprt] init MJPEGRTPpacketizer fail,return:%d", this, ret);
+        ReleaseAll();
+        return -4;
+    }
+    m_pRTPPacketizer->SetPaylodaType(97);
+    m_pRTPPacketizer->SetSSRC(0x12345678);
+    RTPPacketizer::RtpPacketCallbaclk pRtpPacketCallbaclk = std::bind(&ImageTransoprt::OnRecvRtpPacket, this, std::placeholders::_1, std::placeholders::_2);
+    m_pRTPPacketizer->SetRtpPacketCallbaclk(pRtpPacketCallbaclk);
+
+    if (m_bEnableFec)
+    {
+        m_pFECEncoder = new RFC8627FECEncoder();
+        m_pFECEncoder->SetPayloadType(109);
+        m_pFECEncoder->SetSSRC(0x23456789);
+        ret = m_pFECEncoder->Init(7, 7);
+        if (ret < 0)
+        {
+            Error("[%p][ImageTransoprt::StartTransoprt] init RFC8627FECEncoder fail,return:%d", this, ret);
+            ReleaseAll();
+            return -5;
+        }
+        RFC8627FECEncoder::FECEncoderPacketCallback pFECEncoderPacketCallback = std::bind(&ImageTransoprt::OnRecvFECEncoderPacket, this, std::placeholders::_1);
+        m_pFECEncoder->SetFECEncoderPacketCallback(pFECEncoderPacketCallback);
+    }
+
+    m_bStopTransoprt = false;
+    cap.m_nWidth = g_nCaptureWidth;
+    cap.m_nHeight = g_nCaptureHeight;
+    ret = m_pVideoCapture->StartCapture(device, cap);
+    {
+        if (ret < 0)
+        {
+            Error("[%p][ImageTransoprt::StartTransoprt] StartCapture video fail,return:%d", this, ret);
+            ReleaseAll();
+            return -6;
+        }
+    }
+
+    m_pTransoprtThread = new std::thread(&ImageTransoprt::TransoprtThread, this);
+    m_pEncoderThread = new std::thread(&ImageTransoprt::EncoderThread, this);
+    m_pDecodeThread = new std::thread(&ImageTransoprt::DecodeThread, this);
+    m_eVideoType = VIDEO_TYPE_MJPG;
 
     return 0;
 }
@@ -265,11 +407,11 @@ void ImageTransoprt::OnRecvEncodedPacket(std::shared_ptr<VideoPacket>& pVideo)
     std::lock_guard<std::mutex> lock(m_EncodedPacketListLock);
     m_EncodedPacketList.push_back(pVideo);
 
-    while (m_EncodedPacketList.size() > MAX_CAPTURE_VIDEO_NUM)
+    while (m_EncodedPacketList.size() > 3)
     {
         auto pVideoPacket = m_EncodedPacketList.front();
         m_EncodedPacketList.pop_front();
-        Warn("[%p][ImageTransoprt::OnRecvEncodedPacket] Encoded Packet List  size > %d,discard", this, MAX_CAPTURE_VIDEO_NUM);
+        Warn("[%p][ImageTransoprt::OnRecvEncodedPacket] Encoded Packet List  size > %d,discard", this, 3);
     }
 }
 
@@ -348,7 +490,7 @@ void ImageTransoprt::DecodeThread()
 
         if (pCaptureVideo == nullptr)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
             continue;
         }
 
@@ -393,7 +535,7 @@ void ImageTransoprt::EncoderThread()
 
         if (m_DecodedFrame == nullptr)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
             continue;
         }
 
@@ -423,7 +565,7 @@ void ImageTransoprt::TransoprtThread()
 
         if (pEncodedPacket == nullptr)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
             continue;
         }
 

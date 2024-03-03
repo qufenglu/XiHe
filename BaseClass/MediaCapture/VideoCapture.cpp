@@ -275,8 +275,9 @@ void VideoCapture::VideoCaptureThread()
             }
             else if (errno != EINTR)
             {
-                Warn("[%p][VideoCapture::VideoCaptureProc] Could not sync on a buffer on device error:%s ", this, strerror(errno));
-                continue;
+                Error("[%p][VideoCapture::VideoCaptureProc] Could not sync on a buffer on device error:%s ", this, strerror(errno));
+                m_bStopCaptureVideo = true;
+                goto exit;
             }
         }
 
@@ -300,10 +301,9 @@ void VideoCapture::VideoCaptureThread()
         {
             Warn("[%p][VideoCapture::VideoCaptureProc] Failed to enqueue capture buffer", this);
         }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
+exit:
     close(m_nCameraFd);
     m_nCameraFd = -1;
 

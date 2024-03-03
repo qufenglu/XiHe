@@ -11,6 +11,10 @@ VideoEncoder::VideoEncoder() :
     m_pFrame = nullptr;
     m_pPacket = nullptr;
     m_pVideoPacketCallback = nullptr;
+    m_nResampleSrcWidth = 0;
+    m_nResampleSrcHight = 0;
+    m_pResampleContext = nullptr;
+    m_pResampleFrame = nullptr;
 }
 
 VideoEncoder::~VideoEncoder()
@@ -37,6 +41,17 @@ int32_t VideoEncoder::ReleaseAll()
         delete m_pVideoInfo;
         m_pVideoInfo = nullptr;
     }
+    if (m_pResampleContext != nullptr)
+    {
+        sws_freeContext(m_pResampleContext);
+        m_pResampleContext = nullptr;
+    }
+    if (m_pResampleFrame != nullptr)
+    {
+        av_frame_free(&m_pResampleFrame);
+    }
+    m_nResampleSrcWidth = 0;
+    m_nResampleSrcHight = 0;
 
     return 0;
 }
@@ -55,7 +70,15 @@ int32_t VideoEncoder::OpenEncoder(const EncodParam& param)
         //m_pAVCodec = avcodec_find_encoder(AV_CODEC_ID_H264);
         //m_pAVCodec = avcodec_find_encoder_by_name("h264_omx");
         //m_pAVCodec = avcodec_find_encoder_by_name("h264_mmal");
-        m_pAVCodec = avcodec_find_encoder_by_name("h264_v4l2m2m");
+        if (param.m_nCodecID == AV_CODEC_ID_H264)
+        {
+            m_pAVCodec = avcodec_find_encoder_by_name("h264_v4l2m2m");
+        }
+        else if(param.m_nCodecID == AV_CODEC_ID_MJPEG)
+        {
+            m_pAVCodec = avcodec_find_encoder(AV_CODEC_ID_MJPEG);
+        }
+
         if (m_pAVCodec == nullptr)
         {
             ReleaseAll();
@@ -70,18 +93,30 @@ int32_t VideoEncoder::OpenEncoder(const EncodParam& param)
             return -3;
         }
 
-        m_pAVContext->codec_id = AV_CODEC_ID_H264;
-        m_pAVContext->codec_type = AVMEDIA_TYPE_VIDEO;
-        m_pAVContext->pix_fmt = AV_PIX_FMT_YUV420P;
-        m_pAVContext->width = param.m_nWidth;
-        m_pAVContext->height = param.m_nHeight;
-        m_pAVContext->time_base.num = 1;
-        m_pAVContext->time_base.den = 25;
-        m_pAVContext->bit_rate = param.m_nBitRate;
-        m_pAVContext->gop_size = 50;
-        m_pAVContext->qmin = 10;
-        m_pAVContext->qmax = 51;
-        m_pAVContext->max_b_frames = 0;
+        if (param.m_nCodecID == AV_CODEC_ID_H264)
+        {
+            m_pAVContext->codec_id = (AVCodecID)param.m_nCodecID;
+            m_pAVContext->codec_type = AVMEDIA_TYPE_VIDEO;
+            m_pAVContext->pix_fmt = AV_PIX_FMT_YUV420P;
+            m_pAVContext->width = param.m_nWidth;
+            m_pAVContext->height = param.m_nHeight;
+            m_pAVContext->time_base.num = 1;
+            m_pAVContext->time_base.den = 25;
+            m_pAVContext->bit_rate = param.m_nBitRate;
+            m_pAVContext->gop_size = 50;
+            m_pAVContext->qmin = 10;
+            m_pAVContext->qmax = 51;
+            m_pAVContext->max_b_frames = 0;
+        }
+        else if (param.m_nCodecID == AV_CODEC_ID_MJPEG)
+        {
+            m_pAVContext->bit_rate = param.m_nBitRate;
+            m_pAVContext->codec_id = (AVCodecID)param.m_nCodecID;
+            m_pAVContext->width = param.m_nWidth;;
+            m_pAVContext->height = param.m_nHeight;
+            m_pAVContext->time_base = (AVRational){ 1, 15 };
+            m_pAVContext->pix_fmt = AV_PIX_FMT_YUVJ420P;
+        }
 
         AVDictionary* param = 0;
         if (m_pAVContext->codec_id == AV_CODEC_ID_H264)
@@ -89,7 +124,7 @@ int32_t VideoEncoder::OpenEncoder(const EncodParam& param)
             av_dict_set(&param, "preset", "slow", 0);
             av_dict_set(&param, "tune", "zerolatency", 0);
         }
-        //m_pAVContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+        m_pAVContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
         if (avcodec_open2(m_pAVContext, m_pAVCodec, nullptr) < 0)
         {
@@ -152,12 +187,129 @@ int32_t VideoEncoder::CloseEncoder()
     return 0;
 }
 
+int32_t VideoEncoder::ResampleIfNeed(std::shared_ptr<VideoFrame>& pVideoPacket)
+{
+    if (pVideoPacket->m_nWidth == m_pVideoInfo->m_nWidth && pVideoPacket->m_nHeight == m_pVideoInfo->m_nHight)
+    {
+        return 0;
+    }
+
+    if (m_nResampleSrcWidth != pVideoPacket->m_nWidth || m_nResampleSrcHight != pVideoPacket->m_nHeight)
+    {
+        if (m_pResampleContext != nullptr)
+        {
+            sws_freeContext(m_pResampleContext);
+            m_pResampleContext = nullptr;
+        }
+        if (m_pResampleFrame != nullptr)
+        {
+            av_frame_free(&m_pResampleFrame);
+        }
+    }
+
+    if (m_pResampleFrame == nullptr)
+    {
+        m_pResampleFrame = av_frame_alloc();
+        if (m_pResampleFrame == nullptr)
+        {
+            Error("[%p][VideoEncoder::Resample] Alloc frame fail", this);
+            return -1;
+        }
+        m_pResampleFrame->width = m_pVideoInfo->m_nWidth;
+        m_pResampleFrame->height = m_pVideoInfo->m_nHight;
+        m_pResampleFrame->format = AV_PIX_FMT_YUVJ420P;
+        int ret = av_frame_get_buffer(m_pResampleFrame, 32);
+        if (ret != 0)
+        {
+            Error("[%p][VideoEncoder::Resample] av_frame_get_buffer  fail,return:%d", this, ret);
+            av_frame_free(&m_pResampleFrame);
+            return -2;
+        }
+    }
+
+    if (m_pResampleContext == nullptr)
+    {
+        m_nResampleSrcWidth = pVideoPacket->m_nWidth;
+        m_nResampleSrcHight = pVideoPacket->m_nHeight;
+        m_pResampleContext = sws_getContext(m_nResampleSrcWidth, m_nResampleSrcHight, (AVPixelFormat)AV_PIX_FMT_YUVJ420P,
+            m_pVideoInfo->m_nWidth, m_pVideoInfo->m_nHight, AV_PIX_FMT_YUVJ420P, SWS_FAST_BILINEAR, nullptr, nullptr, nullptr);
+        if (m_pResampleContext == nullptr)
+        {
+            Error("[%p][VideoEncoder::Resample] sws_getContext fail,width:%d height:%d format:%d",
+                this, m_nResampleSrcWidth, m_nResampleSrcHight, AV_PIX_FMT_YUVJ420P);
+            m_nResampleSrcWidth = 0;
+            m_nResampleSrcHight = 0;
+            return -3;
+        }
+    }
+
+    uint8_t* data[AV_NUM_DATA_POINTERS] = { 0,0,0,0,0,0,0,0 };
+    int linesize[AV_NUM_DATA_POINTERS] = { 0,0,0,0,0,0,0,0 };
+    data[0] = pVideoPacket->m_pData;
+    data[1] = data[0] + (pVideoPacket->m_nWidth * pVideoPacket->m_nHeight);
+    data[2] = data[1] + (pVideoPacket->m_nWidth * pVideoPacket->m_nHeight / 4);
+    linesize[0] = pVideoPacket->m_nWidth;
+    linesize[1] = pVideoPacket->m_nWidth / 2;
+    linesize[2] = pVideoPacket->m_nWidth / 2;
+    int ret = sws_scale(m_pResampleContext, (uint8_t const**)data, linesize, 0, pVideoPacket->m_nHeight,
+        m_pResampleFrame->data, m_pResampleFrame->linesize);
+    if (ret < 0)
+    {
+        Error("[%p][VideoEncoder::Resample] sws_scale fail,return:%d", ret);
+        return -4;
+    }
+
+    pVideoPacket->m_nWidth = m_pVideoInfo->m_nWidth;
+    pVideoPacket->m_nHeight = m_pVideoInfo->m_nHight;
+    free(pVideoPacket->m_pData);
+    pVideoPacket->m_pData = (uint8_t*)malloc(pVideoPacket->m_nWidth * pVideoPacket->m_nHeight * 3 / 2);
+    if (pVideoPacket->m_pData == nullptr)
+    {
+        pVideoPacket = nullptr;
+        Error("[%p][VideoEncoder::Resample] malloc data fail VideoPacket fail");
+        return -5;
+    }
+
+    pVideoPacket->m_nLength = pVideoPacket->m_nWidth * pVideoPacket->m_nHeight * 3 / 2;
+    uint8_t* pY = pVideoPacket->m_pData;
+    uint8_t* pU = pY + m_pResampleFrame->width * m_pResampleFrame->height;
+    uint8_t* pV = pU + m_pResampleFrame->width * m_pResampleFrame->height / 4;
+    int nSrcYOffset = 0;
+    int nDstYOffset = 0;
+    for (int i = 0; i < m_pResampleFrame->height; i++)
+    {
+        memcpy(pY + nDstYOffset, m_pResampleFrame->data[0] + nSrcYOffset, m_pResampleFrame->width);
+        nSrcYOffset += m_pResampleFrame->linesize[0];
+        nDstYOffset += m_pResampleFrame->width;
+    }
+    int nSrcUOffset = 0;
+    int nSrcVOffset = 0;
+    int nDstUVOffset = 0;
+    for (int i = 0; i < m_pResampleFrame->height / 2; i++)
+    {
+        memcpy(pU + nDstUVOffset, m_pResampleFrame->data[1] + nSrcUOffset, m_pResampleFrame->width / 2);
+        memcpy(pV + nDstUVOffset, m_pResampleFrame->data[2] + nSrcVOffset, m_pResampleFrame->width / 2);
+        nSrcUOffset +=  m_pResampleFrame->linesize[1];
+        nSrcVOffset += m_pResampleFrame->linesize[2];
+        nDstUVOffset += (m_pResampleFrame->width / 2);
+    }
+
+    return 0;
+}
+
 int32_t VideoEncoder::EncodeFrame(std::shared_ptr<VideoFrame> pVideoPacket)
 {
     if (pVideoPacket->m_nFrameType != AV_PIX_FMT_YUV420P && pVideoPacket->m_nFrameType != AV_PIX_FMT_YUVJ420P)
     {
         Error("[%p][VideoEncoder::EncodeFrame] not support FrameType:%d", this, pVideoPacket->m_nFrameType);
         return -1;
+    }
+
+    int ret = ResampleIfNeed(pVideoPacket);
+    if (ret != 0)
+    {
+        Error("[%p][VideoEncoder::EncodeFrame] ResampleIfNeed faiil,return:%d", this, ret);
+        return -2;
     }
 
     {
@@ -279,15 +431,30 @@ int32_t VideoEncoder::OutputVideoPacket()
     pVideoPacket->m_lDTS = m_pPacket->dts;
     pVideoPacket->m_lPTS = m_pPacket->pts;
     pVideoPacket->m_nFrameType = m_pAVContext->codec_id;
-    pVideoPacket->m_pData = (uint8_t*)malloc(m_pPacket->size - 4);
-    if (pVideoPacket->m_pData == nullptr)
+    if (m_pAVContext->codec_id == AV_CODEC_ID_H264 || m_pAVContext->codec_id == AV_CODEC_ID_H265)
     {
-        Error("[%p][VideoEncoder::OutputVideoPacket] malloc video data fail", this);
-        pVideoPacket = nullptr;
-        return -3;
+        pVideoPacket->m_pData = (uint8_t*)malloc(m_pPacket->size - 4);
+        if (pVideoPacket->m_pData == nullptr)
+        {
+            Error("[%p][VideoEncoder::OutputVideoPacket] malloc video data fail", this);
+            pVideoPacket = nullptr;
+            return -3;
+        }
+        memcpy(pVideoPacket->m_pData, m_pPacket->data + 4, m_pPacket->size - 4);
+        pVideoPacket->m_nLength = m_pPacket->size - 4;
     }
-    memcpy(pVideoPacket->m_pData, m_pPacket->data + 4, m_pPacket->size - 4);
-    pVideoPacket->m_nLength = m_pPacket->size - 4;
+    else
+    {
+        pVideoPacket->m_pData = (uint8_t*)malloc(m_pPacket->size);
+        if (pVideoPacket->m_pData == nullptr)
+        {
+            Error("[%p][VideoEncoder::OutputVideoPacket] malloc video data fail", this);
+            pVideoPacket = nullptr;
+            return -3;
+        }
+        memcpy(pVideoPacket->m_pData, m_pPacket->data, m_pPacket->size);
+        pVideoPacket->m_nLength = m_pPacket->size;
+    }
 
     m_pVideoPacketCallback(pVideoPacket);
 

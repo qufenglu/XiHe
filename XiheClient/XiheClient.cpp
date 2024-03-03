@@ -46,8 +46,10 @@ int32_t XIheClient::PlayDevice(const std::string& device)
     }
 
     char url[1024];
-    sprintf(url, "rtsp://%s:%d/device/%s", m_strRemoteIp.c_str(), m_nRemotePort, device.c_str());
-    int ret = m_pRTSPClient->PlayUrl(url);
+    sprintf(url, "rtsp://%s:%d/device/%s?image=mpeg&resolution=480*272&fps=20", m_strRemoteIp.c_str(), m_nRemotePort, device.c_str());
+    int ret = m_pRTSPClient->PlayUrl(url, RTSPClient::TransportType::TCP);
+    //sprintf(url, "rtsp://%s:%d/device/%s", m_strRemoteIp.c_str(), m_nRemotePort, device.c_str());
+    //int ret = m_pRTSPClient->PlayUrl(url, RTSPClient::TransportType::UDP);
     if (ret != 0)
     {
         Error("[%p][XIheClient::PlayDevice] PlayUrl fail.return:%d", this, ret);
