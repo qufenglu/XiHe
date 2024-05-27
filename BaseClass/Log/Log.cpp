@@ -19,7 +19,7 @@ int32_t InitLog(std::string path)
         return -1;
     }
 
-    g_pLogFile = freopen(path.c_str(), "ab+", stdout);
+    g_pLogFile = fopen(path.c_str(), "ab+");
     if (g_pLogFile == nullptr)
     {
         return -2;
@@ -45,14 +45,6 @@ int32_t UnInitLog()
 
 int32_t GetTimeStr(char* buff, size_t size)
 {
-    /*time_t curentTime;
-    time(&curentTime);
-    tm* pCurentTime = localtime(&curentTime);
-    if (0 == strftime(buff, size, "%Y-%m-%d %T", pCurentTime))
-    {
-        return -1;
-    }*/
-
     auto now = std::chrono::system_clock::now();
     uint64_t disMillseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count()
         - std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count() * 1000;
@@ -84,15 +76,14 @@ void Error(const char* format, ...)
         GetTimeStr(buff, 64);
 
         std::lock_guard<std::mutex> lock(g_cLogLock);
-        std::cout << buff << " [E] ";
+        g_pLogFile == nullptr ? printf("%s%s", buff, " [Error] ") : fprintf(g_pLogFile, "%s%s", buff, " [Error] ");
 
-        va_list list;
-        va_start(list, 1);
-        vprintf(format, list);
-        printf("\n");
-        va_end(list);
+        va_list args;
+        va_start(args, format);
+        g_pLogFile == nullptr ? vprintf(format, args) : vfprintf(g_pLogFile, format, args);
+        va_end(args);
 
-        std::cout << std::endl;
+        g_pLogFile == nullptr ? printf("\r\n") : fprintf(g_pLogFile, "\r\n");
     }
 }
 
@@ -108,15 +99,14 @@ void Warn(const char* format, ...)
         GetTimeStr(buff, 64);
 
         std::lock_guard<std::mutex> lock(g_cLogLock);
-        std::cout << buff << " [W] ";
+        g_pLogFile == nullptr ? printf("%s%s", buff, " [Warn] ") : fprintf(g_pLogFile, "%s%s", buff, " [Warn] ");
 
-        va_list list;
-        va_start(list, 1);
-        vprintf(format, list);
-        printf("\n");
-        va_end(list);
+        va_list args;
+        va_start(args, format);
+        g_pLogFile == nullptr ? vprintf(format, args) : vfprintf(g_pLogFile, format, args);
+        va_end(args);
 
-        std::cout << std::endl;
+        g_pLogFile == nullptr ? printf("\r\n") : fprintf(g_pLogFile, "\r\n");
     }
 }
 
@@ -132,15 +122,14 @@ void Trace(const char* format, ...)
         GetTimeStr(buff, 64);
 
         std::lock_guard<std::mutex> lock(g_cLogLock);
-        std::cout << buff << " [T] ";
+        g_pLogFile == nullptr ? printf("%s%s", buff, " [Trace] ") : fprintf(g_pLogFile, "%s%s", buff, " [Trace] ");
 
-        va_list list;
-        va_start(list, 1);
-        vprintf(format, list);
-        printf("\n");
-        va_end(list);
+        va_list args;
+        va_start(args, format);
+        g_pLogFile == nullptr ? vprintf(format, args) : vfprintf(g_pLogFile, format, args);
+        va_end(args);
 
-        std::cout << std::endl;
+        g_pLogFile == nullptr ? printf("\r\n") : fprintf(g_pLogFile, "\r\n");
     }
 }
 
@@ -156,15 +145,14 @@ void Debug(const char* format, ...)
         GetTimeStr(buff, 64);
 
         std::lock_guard<std::mutex> lock(g_cLogLock);
-        std::cout << buff << " [D] ";
+        g_pLogFile == nullptr ? printf("%s%s", buff, " [Debug] ") : fprintf(g_pLogFile, "%s%s", buff, " [Debug] ");
 
-        va_list list;
-        va_start(list, 1);
-        vprintf(format, list);
-        printf("\n");
-        va_end(list);
+        va_list args;
+        va_start(args, format);
+        g_pLogFile == nullptr ? vprintf(format, args) : vfprintf(g_pLogFile, format, args);
+        va_end(args);
 
-        std::cout << std::endl;
+        g_pLogFile == nullptr ? printf("\r\n") : fprintf(g_pLogFile, "\r\n");
     }
 }
 
@@ -180,14 +168,13 @@ void Panic(const char* format, ...)
         GetTimeStr(buff, 64);
 
         std::lock_guard<std::mutex> lock(g_cLogLock);
-        std::cout << buff << " [P] ";
+        g_pLogFile == nullptr ? printf("%s%s", buff, " [Panic] ") : fprintf(g_pLogFile, "%s%s", buff, " [Panic] ");
 
-        va_list list;
-        va_start(list, 1);
-        vprintf(format, list);
-        printf("\n");
-        va_end(list);
+        va_list args;
+        va_start(args, format);
+        g_pLogFile == nullptr ? vprintf(format, args) : vfprintf(g_pLogFile, format, args);
+        va_end(args);
 
-        std::cout << std::endl;
+        g_pLogFile == nullptr ? printf("\r\n") : fprintf(g_pLogFile, "\r\n");
     }
 }
