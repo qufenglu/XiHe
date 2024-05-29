@@ -1,6 +1,5 @@
 #include "VideoDecoder.h"
 #include "Log/Log.h"
-#include "MediaEncoder/VideoEncoder.h"
 
 #define MAX_CPU_COUNT (12)
 
