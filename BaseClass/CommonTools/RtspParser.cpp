@@ -116,10 +116,25 @@ uint32_t RtspParser::ParseRtspResponse(const std::string& strRsp, RtspParser::Rt
     rsp.m_StrErrcode = elements[1];
     rsp.m_StrReason = elements[2];
 
-    for (size_t i = 0; i < nLineSize; i++)
+    for (size_t i = 0; i < nLineSize - 1; i++)
     {
         elements.clear();
         split(lines[i], elements, ": ");
+        if (elements.size() >= 2)
+        {
+            rsp.m_FieldsMap[elements[0]] = elements[1];
+        }
+    }
+
+    std::string strLastLine = lines[nLineSize - 1];
+    if (rsp.m_FieldsMap.find("Content-type") != rsp.m_FieldsMap.end())
+    {
+        rsp.m_StrContent = strLastLine;
+    }
+    else
+    {
+        elements.clear();
+        split(strLastLine, elements, ": ");
         if (elements.size() >= 2)
         {
             rsp.m_FieldsMap[elements[0]] = elements[1];

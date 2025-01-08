@@ -50,10 +50,10 @@ public:
     RtspParser();
     ~RtspParser();
 
-    static uint32_t ParseRtspRequest(const std::string& strReq, RtspParser::RtspRequest& req);
-    static uint32_t ParseRtspResponse(const std::string& strRsp, RtspParser::RtspResponse& rsp);
-    static uint32_t GetStrRequest(std::string& strReq, const RtspParser::RtspRequest& req);
-    static uint32_t GetStrResponse(std::string& strRsp, const RtspParser::RtspResponse& rsp);
+    static int32_t ParseRtspRequest(const std::string& strReq, RtspParser::RtspRequest& req);
+    static int32_t ParseRtspResponse(const std::string& strRsp, RtspParser::RtspResponse& rsp);
+    static int32_t GetStrRequest(std::string& strReq, const RtspParser::RtspRequest& req);
+    static int32_t GetStrResponse(std::string& strRsp, const RtspParser::RtspResponse& rsp);
 
 private:
 
